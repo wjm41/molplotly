@@ -1,8 +1,11 @@
 # molplot
-Scatterplots and family which show molecule images on hover!
+Plotly scatterplots which show molecule images on hovering over the datapoints!
 
 Required packages:
-- rdkit
-- (jupyter_dash)[pip install jupyter-dash]
+- [pandas](https://pandas.pydata.org/docs/getting_started/index.html)
+- [rdkit](http://rdkit.org/docs/Install.html)
+- [jupyter_dash](https://github.com/plotly/jupyter-dash)
 
-`display_hover` controls drawing molecule image and displaying text.
+See `example.ipynb` for an example :)
+
+![Beautiful :)](example.png)
