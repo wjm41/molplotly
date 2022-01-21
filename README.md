@@ -13,8 +13,7 @@ See `example.ipynb` for an example :)
 ---
 
 ### Features to-add:
-1. Add text wrapping for caption strings that are too long
-2. Individual styles for each caption (fonts, colors etc)
-4. Some way to save the plot
+1. Individual styles for each caption (fonts, colors etc)
+2. Some way to save the plot
 3. Highlight points by clicking on them
 4. SVG image generation
