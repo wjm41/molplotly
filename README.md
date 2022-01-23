@@ -1,4 +1,4 @@
-# molplot
+# molplotly
 Plotly scatterplots which show molecule images on hovering over the datapoints!
 
 ![Beautiful :)](example.png)
@@ -11,7 +11,7 @@ Required packages:
 ➡️ See `example.ipynb` for an example :)
 
 ## 📜 Usage
----
+
 ```python
 import pandas as pd
 import plotly.express as px
@@ -66,6 +66,10 @@ app.run_server(mode='inline', port=8011, height=1000)
     
 #### Output parameters
 by default a JupyterDash `app` is returned which can be run inline in a jupyter notebook or deployed on a server via `app.run_server()`
+
+## Acknowledgements
+* [@wjm41](https://github.com/wjm41) (contributor)
+* [@RokasEl](https://github.com/RokasEl) (contributor)
 
 ### Features to-add:
 1. Individual styles for each caption (fonts, colors etc)
