@@ -104,7 +104,8 @@ def add_molecules(fig,
             df_curve = df[df[condition_col] ==
                           curve_dict[curve_num]].reset_index(drop=True)
             df_row = df_curve.iloc[num]
-        df_row = df.iloc[num]
+        else:
+            df_row = df.iloc[num]
 
         hoverbox_elements = []
 
