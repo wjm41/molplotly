@@ -12,7 +12,7 @@ setup(
     author_email='wjm41@cam.ac.uk',
 
     url='https://gitlab.com/wjm41/molplotly',
-    download_url='https://github.com/user/reponame/archive/v_01.tar.gz',
+    download_url='https://gitlab.com/wjm41/molplotly/-/archive/v_01/molplotly-v_01.tar.gz',
 
     keywords=['science', 'chemistry', 'cheminformatics'],
     install_requires=[
