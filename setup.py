@@ -7,7 +7,7 @@ setup(
     # Chose a license from here: https://help.github.com/articles/licensing-a-repository
     license='Apache License, Version 2.0',
 
-    description='TYPE YOUR DESCRIPTION HERE',
+    description='molplotly is an add-on to plotly built on RDKit which allows 2D images of molecules to be shown in scatterplots when hovering over the datapoints.',
     author='William McCorkindale',
     author_email='wjm41@cam.ac.uk',
 
@@ -16,8 +16,9 @@ setup(
 
     keywords=['science', 'chemistry', 'cheminformatics'],
     install_requires=[
-        'validators',
-        'beautifulsoup4',
+        'jupyter-dash',
+        'rdkit',
+        'pandas'
     ],
     classifiers=[
         
