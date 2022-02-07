@@ -23,7 +23,8 @@ def add_molecules(fig,
                   title_col=None,
                   show_coords=True,
                   caption_cols=None,
-                  condition_col=None,
+                  caption_transform={},
+                  color_col=None,
                   wrap=True,
                   wraplen=20,
                   width=150,
@@ -51,7 +52,9 @@ def add_molecules(fig,
         whether or not to show the coordinates of the data point in the hover box (default True)
     caption_cols : list, optional
         list of column names in df to be included in the hover box (default None)
-    condition_col : str, optional
+    caption_transform : dict, optional
+        Functions applied to specific items in all cells. The dict must follow a key: function structure where the key must correspond to one of the columns in subset or tooltip. (default {}})
+    color_col : str, optional
         name of the column in df that is used to color the datapoints in df - necessary when there is discrete conditional coloring (default None)
     wrap : bool, optional
         whether or not to wrap the title text to multiple lines if the length of the text is too long (default True)
@@ -68,17 +71,19 @@ def add_molecules(fig,
 
     colors = {0: 'black'}
     if len(fig.data) != 1:
-        colors = px.colors.qualitative.Plotly
-        if condition_col is not None:
-            if df[condition_col].dtype == bool:
+        if color_col is not None:
+            colors = {index: x.marker['color']
+                      for index, x in enumerate(fig.data)}
+            if df[color_col].dtype == bool:
                 curve_dict = {index: str2bool(x['name'])
                               for index, x in enumerate(fig.data)}
+
             else:
                 curve_dict = {index: x['name']
                               for index, x in enumerate(fig.data)}
         else:
             raise ValueError(
-                'condition_col needs to be specified if there is more than one plotly curve in the figure!')
+                'color_col needs to be specified if there is more than one plotly curve in the figure!')
 
     app = JupyterDash(__name__)
     app.layout = html.Div([
@@ -101,7 +106,7 @@ def add_molecules(fig,
         curve_num = pt['curveNumber']
 
         if len(fig.data) != 1:
-            df_curve = df[df[condition_col] ==
+            df_curve = df[df[color_col] ==
                           curve_dict[curve_num]].reset_index(drop=True)
             df_row = df_curve.iloc[num]
         else:
@@ -132,15 +137,32 @@ def add_molecules(fig,
                 html.H2(f"{title}", style={"color": colors[curve_num],
                         "font-family": fontfamily, "fontSize": fontsize+2}))
         if show_coords:
-            hoverbox_elements.append(html.P(f"{fig.layout.xaxis.title.text}: {pt['x']}",
-                                            style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
-            hoverbox_elements.append(html.P(f"{fig.layout.yaxis.title.text} : {pt['y']}",
-                                            style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
+            x_label = fig.layout.xaxis.title.text
+            y_label = fig.layout.yaxis.title.text
+            if x_label in caption_transform:
+                style_str = caption_transform[x_label](pt['x'])
+                hoverbox_elements.append(html.P(f"{x_label} : {style_str}",
+                                                style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
+            else:
+                hoverbox_elements.append(html.P(f"{x_label}: {pt['x']}",
+                                                style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
+            if y_label in caption_transform:
+                style_str = caption_transform[y_label](pt['y'])
+                hoverbox_elements.append(html.P(f"{y_label} : {style_str}",
+                                                style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
+            else:
+                hoverbox_elements.append(html.P(f"{y_label} : {pt['y']}",
+                                                style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
         if caption_cols is not None:
             for caption in caption_cols:
                 caption_val = df_row[caption]
-                hoverbox_elements.append(html.P(f"{caption} : {caption_val}",
-                                                style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
+                if caption in caption_transform:
+                    style_str = caption_transform[caption](caption_val)
+                    hoverbox_elements.append(html.P(f"{caption} : {style_str}",
+                                                    style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
+                else:
+                    hoverbox_elements.append(html.P(f"{caption} : {caption_val}",
+                                                    style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
         children = [html.Div(hoverbox_elements, style={
             'width': f'{width}px', 'white-space': 'normal'})]
 
