@@ -2,3 +2,5 @@ setup*
 MANIFEST
 dist/
 molplotly.egg-info/
+
+*.pyc
