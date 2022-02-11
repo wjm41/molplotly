@@ -76,6 +76,9 @@ by default a JupyterDash `app` is returned which can be run inline in a jupyter 
 * The recommended `height` of the app is `50+(height of the plotly figure)`.
 * For the `port` of the app, make sure you don't pick the same `port` as another `molplotly` plot otherwise the tooltips will clash with each other!
 
+## 💻 &nbsp; Can I run this in colab?
+JupyterDash is supposed to have support for Google Colab but at some point that seems to have broken... Keep an eye on the raised issue [here](https://github.com/plotly/jupyter-dash/issues/10)!
+
 ## 💾 &nbsp; Can I save these plots?
 `moltplotly` works using a Dash app which is non-trivial to export because server side javascript is needed in addition to HTML/CSS styling ([as detailed here](https://stackoverflow.com/questions/60097577/how-to-export-a-plotly-dashboard-app-into-a-html-standalone-file-to-share-with-t))
 
