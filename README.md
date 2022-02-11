@@ -76,6 +76,14 @@ by default a JupyterDash `app` is returned which can be run inline in a jupyter 
 * The recommended `height` of the app is `50+(height of the plotly figure)`.
 * For the `port` of the app, make sure you don't pick the same `port` as another `molplotly` plot otherwise the tooltips will clash with each other!
 
+## 💾 &nbsp; Can I save these plots?
+`moltplotly` works using a Dash app which is non-trivial to export because server side javascript is needed in addition to HTML/CSS styling ([as detailed here](https://stackoverflow.com/questions/60097577/how-to-export-a-plotly-dashboard-app-into-a-html-standalone-file-to-share-with-t))
+
+Until I find a way to get around that, the best alternative is exporting the plotly figure without molecules showing :( as detailed in this [page](https://plotly.com/python/interactive-html-export/). If you want to use it in a presentation I'd suggest keeping the figure open in a browser and changing windows to it during your talk!
+
+## 🛑 &nbsp;Warning about memory size  
+Just adding a warning here that memory usage in a notebook can increase significanly when using plotly (not `molplotly`'s fault!). If you notice your jupyter notebook slowing down, plotly itself is a likely culprit... In that case I'd consider either using plotly with [static image rendering](https://plotly.com/python/renderers/#static-image-renderers), or ... use [seaborn](https://seaborn.pydata.org/index.html) :P
+
 ## Acknowledgements
 * [@wjm41](https://github.com/wjm41) (contributor)
 * [@RokasEl](https://github.com/RokasEl) (contributor)
