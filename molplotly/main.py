@@ -88,25 +88,32 @@ def add_molecules(fig,
                 'color_col needs to be specified if there is more than one plotly curve in the figure!')
 
     app = JupyterDash(__name__)
-    app.layout = html.Div([
+    if isinstance(smiles_col, list):
+        app.layout = html.Div([
         dcc.Graph(id="graph-basic-2", figure=fig, clear_on_unhover=True),
         dcc.Tooltip(id="graph-tooltip"),
+        dcc.Slider(0, len(smiles_col), marks={i:smiles_col[i] for i in range(len(smiles_col))}, value=0,
+                   id='smiles-slider')
     ])
+    else:    
+        app.layout = html.Div([
+            dcc.Graph(id="graph-basic-2", figure=fig, clear_on_unhover=True),
+            dcc.Tooltip(id="graph-tooltip"),
+        ])
 
     @app.callback(
         output=[Output("graph-tooltip", "show"), Output("graph-tooltip",
                                                         "bbox"), Output("graph-tooltip", "children")],
-        inputs=[Input("graph-basic-2", "hoverData")]
+        inputs=[Input("graph-basic-2", "hoverData"), Input("smiles-slider", "value")]
     )
-    def display_hover(hoverData):
+    def display_hover(hoverData, value):
         if hoverData is None:
             return False, no_update, no_update
-
         pt = hoverData["points"][0]
         bbox = pt["bbox"]
         num = pt["pointNumber"]
         curve_num = pt['curveNumber']
-
+        smi_col = smiles_col[value]
         if len(fig.data) != 1:
             df_curve = df[df[color_col] ==
                           curve_dict[curve_num]].reset_index(drop=True)
@@ -118,7 +125,12 @@ def add_molecules(fig,
 
         if show_img:
             # The 2D image of the molecule is generated here
-            smiles = df_row[smiles_col]
+            with open('./temp.log', 'w') as handle:
+                handle.write(value+'\n')
+                handle.write(smiles_col[value])
+            print(value)
+            print(smiles_col[value])
+            smiles = df_row[smi_col]
             buffered = BytesIO()
             img = Chem.Draw.MolToImage(Chem.MolFromSmiles(smiles))
             img.save(buffered, format="PNG")
