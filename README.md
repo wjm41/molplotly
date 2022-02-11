@@ -4,7 +4,7 @@
 
 `molplotly` is an add-on to `plotly` built on RDKit which allows 2D images of molecules to be shown in `plotly` figures when hovering over the datapoints.
 
-![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/example.gif)
+![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/color.gif)
 ![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/pca.gif)
 
 Required packages:
