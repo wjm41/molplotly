@@ -12,7 +12,7 @@ Required packages:
 - [pandas](https://pandas.pydata.org/docs/getting_started/index.html)
 - [jupyter_dash](https://github.com/plotly/jupyter-dash)
 
-➡️ &nbsp;A readable walkthrough of how to use the package together with some useful examples can be found in [this blog post](link to my website) while a runnable notebook can be found in `example.ipynb` :)
+➡️ &nbsp;A readable walkthrough of how to use the package together with some useful examples can be found in [this blog post](https://www.wmccorkindale.com/post/introducing-molplotly) while a runnable notebook can be found in `example.ipynb` :)
 
 ## 📜 &nbsp;Usage
 
