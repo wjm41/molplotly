@@ -53,7 +53,7 @@ def add_molecules(fig,
     caption_cols : list, optional
         list of column names in df to be included in the hover box (default None)
     caption_transform : dict, optional
-        Functions applied to specific items in all cells. The dict must follow a key: function structure where the key must correspond to one of the columns in subset or tooltip. (default {}})
+        Functions applied to specific items in all cells. The dict must follow a key: function structure where the key must correspond to one of the columns in subset or tooltip. (default {})
     color_col : str, optional
         name of the column in df that is used to color the datapoints in df - necessary when there is discrete conditional coloring (default None)
     wrap : bool, optional
@@ -77,7 +77,9 @@ def add_molecules(fig,
             if df[color_col].dtype == bool:
                 curve_dict = {index: str2bool(x['name'])
                               for index, x in enumerate(fig.data)}
-
+            elif df[color_col].dtype == int:
+                curve_dict = {index: int(x['name'])
+                              for index, x in enumerate(fig.data)}
             else:
                 curve_dict = {index: x['name']
                               for index, x in enumerate(fig.data)}
