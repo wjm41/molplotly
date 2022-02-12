@@ -6,6 +6,7 @@
 
 ![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/color.gif)
 ![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/pca.gif)
+![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/multiple_smiles.gif)
 
 Required packages:
 - [rdkit](http://rdkit.org/docs/Install.html)
