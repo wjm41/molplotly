@@ -23,8 +23,9 @@ def add_molecules(
     df,
     smiles_col="SMILES",
     show_img=True,
-    alpha=1.0,
-    img_alpha=1.0,
+    svg_size=200,
+    alpha=0.75,
+    img_alpha=0.7,
     title_col=None,
     show_coords=True,
     caption_cols=None,
@@ -132,7 +133,7 @@ def add_molecules(
             smiles = df_row[smiles_col]
             buffered = BytesIO()
             img = Chem.Draw.MolToImage(Chem.MolFromSmiles(smiles))
-            d2d = rdMolDraw2D.MolDraw2DSVG(300, 300)
+            d2d = rdMolDraw2D.MolDraw2DSVG(svg_size, svg_size)
             opts = d2d.drawOptions()
             opts.clearBackground = False
             d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
