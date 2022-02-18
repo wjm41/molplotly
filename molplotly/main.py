@@ -74,8 +74,27 @@ def add_molecules(
     fontsize : int, optional
         the font size used in the hover box - the font of the title line is fontsize+2 (default 12)
     """
+    if not isinstance(smiles_col, list):
+        smiles_col = [smiles_col]
     fig.update_traces(hoverinfo="none", hovertemplate=None)
+    df_img = df[smiles_col].copy()
+    # df_img.drop_duplicates(subset=smiles_col)
 
+    for i, row in df_img.iterrows():
+        for col in smiles_col:
+            # print(smiles)
+            buffered = BytesIO()
+            d2d = rdMolDraw2D.MolDraw2DSVG(svg_size, svg_size)
+            opts = d2d.drawOptions()
+            opts.clearBackground = False
+            d2d.DrawMolecule(Chem.MolFromSmiles(row[col]))
+            d2d.FinishDrawing()
+            img_str = d2d.GetDrawingText()
+            buffered.write(str.encode(img_str))
+            img_str = base64.b64encode(buffered.getvalue())
+            img_str = "data:image/svg+xml;base64,{}".format(repr(img_str)[2:-1])
+
+            df_img.loc[i, f"{col}_img"] = img_str
     colors = {0: "black"}
     if len(fig.data) != 1:
         if color_col is not None:
@@ -129,30 +148,21 @@ def add_molecules(
         hoverbox_elements = []
 
         if show_img:
-            # The 2D image of the molecule is generated here
-            smiles = df_row[smiles_col]
-            buffered = BytesIO()
-            img = Chem.Draw.MolToImage(Chem.MolFromSmiles(smiles))
-            d2d = rdMolDraw2D.MolDraw2DSVG(svg_size, svg_size)
-            opts = d2d.drawOptions()
-            opts.clearBackground = False
-            d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
-            d2d.FinishDrawing()
-            img_str = d2d.GetDrawingText()
-            buffered.write(str.encode(img_str))
-            img_str = base64.b64encode(buffered.getvalue())
+            # # The 2D image of the molecule is generated here
+            for col in smiles_col:
+                # print(df_row)
+                smiles = df_row[col]
+                img_str = df_img.query(f"{col} == @smiles")[f"{col}_img"].values[0]
 
-            img_str = "data:image/svg+xml;base64,{}".format(repr(img_str)[2:-1])
-
-            hoverbox_elements.append(
-                html.Img(
-                    src=img_str,
-                    style={
-                        "width": "100%",
-                        "background-color": f"rgba(255,255,255,{img_alpha})",
-                    },
+                hoverbox_elements.append(
+                    html.Img(
+                        src=img_str,
+                        style={
+                            "width": "100%",
+                            "background-color": f"rgba(255,255,255,{img_alpha})",
+                        },
+                    )
                 )
-            )
 
         if title_col is not None:
             title = df_row[title_col]
