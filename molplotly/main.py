@@ -42,8 +42,9 @@ def add_molecules(fig,
         a plotly figure object containing datapoints plotted from df
     df : pandas.DataFrame object
         a pandas dataframe that contains the data plotted in fig
-    smiles_col : str, optional
-        name of the column in df containing the smiles plotted in fig (default 'SMILES')
+    smiles_col : str|list[str], optional
+        name of the column in df containing the smiles plotted in fig (default 'SMILES').
+        If provided as a list, will add a slider to choose which column is used for rendering the structures.
     show_img : bool, optional
         whether or not to generate the molecule image in the dash app (default True)
     title_col : str, optional
@@ -53,7 +54,8 @@ def add_molecules(fig,
     caption_cols : list, optional
         list of column names in df to be included in the hover box (default None)
     caption_transform : dict, optional
-        Functions applied to specific items in all cells. The dict must follow a key: function structure where the key must correspond to one of the columns in subset or tooltip. (default {})
+        Functions applied to specific items in all cells. The dict must follow a key: function structure where
+        the key must correspond to one of the columns in subset or tooltip. (default {})
     color_col : str, optional
         name of the column in df that is used to color the datapoints in df - necessary when there is discrete conditional coloring (default None)
     wrap : bool, optional
@@ -88,25 +90,37 @@ def add_molecules(fig,
                 'color_col needs to be specified if there is more than one plotly curve in the figure!')
 
     app = JupyterDash(__name__)
+    
+    if isinstance(smiles_col, str):
+        smiles_col = [smiles_col]
+    
+    if len(smiles_col)>1:
+        slider = dcc.Slider(min=0, max=len(smiles_col)-1, step=1, marks={i:smiles_col[i] for i in range(len(smiles_col))}, value=0,
+                    id='smiles-slider')
+    else:
+        slider = dcc.Store(id='smiles-slider', data=0)
+    
     app.layout = html.Div([
-        dcc.Graph(id="graph-basic-2", figure=fig, clear_on_unhover=True),
-        dcc.Tooltip(id="graph-tooltip"),
+    dcc.Graph(id="graph-basic-2", figure=fig, clear_on_unhover=True),
+    dcc.Tooltip(id="graph-tooltip"),
+    slider
     ])
+
 
     @app.callback(
         output=[Output("graph-tooltip", "show"), Output("graph-tooltip",
                                                         "bbox"), Output("graph-tooltip", "children")],
-        inputs=[Input("graph-basic-2", "hoverData")]
+        inputs=[Input("graph-basic-2", "hoverData"), Input("smiles-slider", "value")]
     )
-    def display_hover(hoverData):
+    def display_hover(hoverData, value):
         if hoverData is None:
             return False, no_update, no_update
-
+        if value is None:
+            value = 0
         pt = hoverData["points"][0]
         bbox = pt["bbox"]
         num = pt["pointNumber"]
         curve_num = pt['curveNumber']
-
         if len(fig.data) != 1:
             df_curve = df[df[color_col] ==
                           curve_dict[curve_num]].reset_index(drop=True)
@@ -118,7 +132,7 @@ def add_molecules(fig,
 
         if show_img:
             # The 2D image of the molecule is generated here
-            smiles = df_row[smiles_col]
+            smiles = df_row[smiles_col[value]]
             buffered = BytesIO()
             img = Chem.Draw.MolToImage(Chem.MolFromSmiles(smiles))
             img.save(buffered, format="PNG")
@@ -169,4 +183,5 @@ def add_molecules(fig,
             'width': f'{width}px', 'white-space': 'normal'})]
 
         return True, bbox, children
+
     return app

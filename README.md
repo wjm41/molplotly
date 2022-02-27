@@ -7,6 +7,7 @@
 
 ![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/color.gif)
 ![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/pca.gif)
+![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/multiple_smiles.gif)
 
 ➡️ &nbsp;A readable walkthrough of how to use the package together with some useful examples can be found in [this blog post](https://www.wmccorkindale.com/post/introducing-molplotly) while a runnable notebook can be found in `example.ipynb` :)
 
