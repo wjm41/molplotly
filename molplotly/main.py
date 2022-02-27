@@ -18,6 +18,25 @@ def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
 
+def test_groups(fig, groups):
+    """Test if plotly figure curve names match up with pandas dataframe groups
+
+    Args:
+        fig (plotly figure): _description_
+        groups (pandas groupby object): _description_
+
+    Returns:
+        _type_: Bool describing whether or not groups is the correct dataframe grouping descbrining the data in fig
+    """
+    for data in fig.data:
+        if data.name in groups:
+            if len(data.x) == len(groups[data.name]):
+                continue
+        else:
+            return False
+    return True
+
+
 def add_molecules(
     fig,
     df,
@@ -30,7 +49,8 @@ def add_molecules(
     show_coords=True,
     caption_cols=None,
     caption_transform={},
-    color_col=None,
+    color_col=[],
+    marker_col=[],
     wrap=True,
     wraplen=20,
     width=150,
@@ -77,46 +97,96 @@ def add_molecules(
         the font size used in the hover box - the font of the title line is fontsize+2 (default 12)
     """
     fig.update_traces(hoverinfo="none", hovertemplate=None)
+    df_data = df.copy()
 
     colors = {0: "black"}
-    if len(fig.data) != 1:
-        if color_col is not None:
-            colors = {index: x.marker["color"] for index, x in enumerate(fig.data)}
-            if df[color_col].dtype == bool:
-                curve_dict = {
-                    index: str2bool(x["name"]) for index, x in enumerate(fig.data)
-                }
-            elif df[color_col].dtype == int:
-                curve_dict = {index: int(x["name"]) for index, x in enumerate(fig.data)}
-            else:
-                curve_dict = {index: x["name"] for index, x in enumerate(fig.data)}
-        else:
-            raise ValueError(
-                "color_col needs to be specified if there is more than one plotly curve in the figure!"
-            )
 
-    app = JupyterDash(__name__)    
+    # TODO assertion that color_cols & symbol_cols add up to length of fig.data
+
+    if len(fig.data) != 1:
+        if (
+            "coloraxis" not in fig.data[0].marker
+        ):  # no continuous colorbar, we need to get color name
+
+            if not color_col:
+                raise ValueError(
+                    "color_col needs to be specified as there exists a coloraxis in the figure!"
+                )
+
+            df_grouped_x = df_data.groupby(color_col + marker_col)
+            groups_x = df_grouped_x.groups
+            df_grouped_y = df_data.groupby(marker_col + color_col)
+            groups_y = df_grouped_y.groups
+            if test_groups(fig.data, groups_x):
+                df_grouped = df_grouped_x
+            elif test_groups(fig.data, groups_y):
+                df_grouped = df_grouped_y
+            else:
+                raise ValueError(
+                    "color_col and marker_col are mispecified because their dataframe grouping names don't match the names in the plotly figure."
+                )
+
+        else:
+            if not marker_col:  # there's a colorbar, just split by marker
+                raise ValueError(
+                    "marker_col needs to be specified as the datasize is in the figure!"
+                )
+
+            df_grouped = df_data.groupby(marker_col)
+            groups = df_grouped.groups
+
+            if not test_groups(fig.data, groups):
+                raise ValueError(
+                    "marker_col is mispecified because the dataframe grouping names don't match the names in the plotly figure."
+                )
+
+        assert len(fig.data) == len(
+            df_grouped, "dataframe grouping doesn't match figure length."
+        )
+        colors = {index: x.marker["color"] for index, x in enumerate(fig.data)}
+        # markers = {in}
+        if df[color_col].dtype == bool:
+            curve_dict = {
+                index: str2bool(x["name"]) for index, x in enumerate(fig.data)
+            }
+        elif df[color_col].dtype == int:
+            curve_dict = {index: int(x["name"]) for index, x in enumerate(fig.data)}
+        else:
+            curve_dict = {index: x["name"] for index, x in enumerate(fig.data)}
+
+    app = JupyterDash(__name__)
     if isinstance(smiles_col, str):
         smiles_col = [smiles_col]
-    
-    if len(smiles_col)>1:
-        slider = dcc.Slider(min=0, max=len(smiles_col)-1, step=1, marks={i:smiles_col[i] for i in range(len(smiles_col))}, value=0,
-                    id='smiles-slider')
+
+    if len(smiles_col) > 1:
+        slider = dcc.Slider(
+            min=0,
+            max=len(smiles_col) - 1,
+            step=1,
+            marks={i: smiles_col[i] for i in range(len(smiles_col))},
+            value=0,
+            id="smiles-slider",
+        )
     else:
-        slider = dcc.Store(id='smiles-slider', data=0)
-    
-    app.layout = html.Div([
-    dcc.Graph(id="graph-basic-2", figure=fig, clear_on_unhover=True),
-    dcc.Tooltip(
+        slider = dcc.Store(id="smiles-slider", data=0)
+
+    app.layout = html.Div(
+        [
+            dcc.Graph(id="graph-basic-2", figure=fig, clear_on_unhover=True),
+            dcc.Tooltip(
                 id="graph-tooltip", background_color=f"rgba(255,255,255,{alpha})"
             ),
-    slider
-    ])
+            slider,
+        ]
+    )
 
     @app.callback(
-        output=[Output("graph-tooltip", "show"), Output("graph-tooltip",
-                                                        "bbox"), Output("graph-tooltip", "children")],
-        inputs=[Input("graph-basic-2", "hoverData"), Input("smiles-slider", "value")]
+        output=[
+            Output("graph-tooltip", "show"),
+            Output("graph-tooltip", "bbox"),
+            Output("graph-tooltip", "children"),
+        ],
+        inputs=[Input("graph-basic-2", "hoverData"), Input("smiles-slider", "value")],
     )
     def display_hover(hoverData, value):
         if hoverData is None:
@@ -128,7 +198,11 @@ def add_molecules(
         num = pt["pointNumber"]
         curve_num = pt["curveNumber"]
 
+        print(hoverData)
+        print(pt)
+
         if len(fig.data) != 1:
+            # TODO replace with query
             df_curve = df[df[color_col] == curve_dict[curve_num]].reset_index(drop=True)
             df_row = df_curve.iloc[num]
         else:
@@ -169,6 +243,8 @@ def add_molecules(
                     title = textwrap.fill(title, width=wraplen)
                 else:
                     title = title[:wraplen] + "..."
+
+            # TODO colorbar color titles
             hoverbox_elements.append(
                 html.H2(
                     f"{title}",
