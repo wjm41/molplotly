@@ -18,7 +18,7 @@ def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
 
-def test_groups(fig, groups):
+def test_groups(fig, df_grouped):
     """Test if plotly figure curve names match up with pandas dataframe groups
 
     Args:
@@ -28,13 +28,59 @@ def test_groups(fig, groups):
     Returns:
         _type_: Bool describing whether or not groups is the correct dataframe grouping descbrining the data in fig
     """
+    str_groups = {}
+    for name, group in df_grouped:
+        # if isinstance(name, bool) or isinstance(name, int):
+        #     str_groups[str(name)] = group
+        if isinstance(name, tuple):
+            str_groups[", ".join(str(x) for x in name)] = group
+        else:
+            str_groups[name] = group
+
     for data in fig.data:
-        if data.name in groups:
-            if len(data.x) == len(groups[data.name]):
+        if data.name in str_groups:
+            if len(data.y) == len(str_groups[data.name]):
                 continue
         else:
             return False
     return True
+
+
+def find_grouping(fig, df_data, cols):
+
+    if len(cols) == 1:
+        df_grouped = df_data.groupby(cols)
+        if not test_groups(fig, df_grouped):
+            raise ValueError(
+                "marker_col is mispecified because the dataframe grouping names don't match the names in the plotly figure."
+            )
+
+    elif len(cols) == 2:  # color_col and marker_col
+
+        df_grouped_x = df_data.groupby(cols)
+        df_grouped_y = df_data.groupby([cols[1], cols[0]])
+
+        if test_groups(fig, df_grouped_x):
+            df_grouped = df_grouped_x
+
+        elif test_groups(fig, df_grouped_y):
+            df_grouped = df_grouped_y
+        else:
+            raise ValueError(
+                "color_col and marker_col are mispecified because their dataframe grouping names don't match the names in the plotly figure."
+            )
+    else:
+        raise ValueError("Too many columns specified for grouping.")
+    
+    str_groups = {}
+    for name, group in df_grouped:
+        if isinstance(name, tuple):
+            str_groups[", ".join(str(x) for x in name)] = group
+        else:
+            str_groups[name] = group
+
+    curve_dict = {index: str_groups[x["name"]] for index, x in enumerate(fig.data)}
+    return df_grouped, curve_dict
 
 
 def add_molecules(
@@ -49,8 +95,8 @@ def add_molecules(
     show_coords=True,
     caption_cols=None,
     caption_transform={},
-    color_col=[],
-    marker_col=[],
+    color_col=None,
+    marker_col=None,
     wrap=True,
     wraplen=20,
     width=150,
@@ -98,61 +144,27 @@ def add_molecules(
     """
     fig.update_traces(hoverinfo="none", hovertemplate=None)
     df_data = df.copy()
-
+    if color_col is not None:
+        df_data[color_col] = df_data[color_col].astype(str)
+    if marker_col is not None:
+        df_data[marker_col] = df_data[marker_col].astype(str)
     colors = {0: "black"}
 
-    # TODO assertion that color_cols & symbol_cols add up to length of fig.data
-
     if len(fig.data) != 1:
-        if (
-            "coloraxis" not in fig.data[0].marker
-        ):  # no continuous colorbar, we need to get color name
-
-            if not color_col:
-                raise ValueError(
-                    "color_col needs to be specified as there exists a coloraxis in the figure!"
-                )
-
-            df_grouped_x = df_data.groupby(color_col + marker_col)
-            groups_x = df_grouped_x.groups
-            df_grouped_y = df_data.groupby(marker_col + color_col)
-            groups_y = df_grouped_y.groups
-            if test_groups(fig.data, groups_x):
-                df_grouped = df_grouped_x
-            elif test_groups(fig.data, groups_y):
-                df_grouped = df_grouped_y
-            else:
-                raise ValueError(
-                    "color_col and marker_col are mispecified because their dataframe grouping names don't match the names in the plotly figure."
-                )
-
+        if color_col is None and marker_col is None:
+            raise ValueError(
+                "More than one plotly curve in figure - color_col and/or marker_col needs to be specified."
+            )
+        if color_col is None:
+            df_grouped, curve_dict = find_grouping(fig, df_data, [marker_col])
+        elif marker_col is None:
+            df_grouped, curve_dict = find_grouping(fig, df_data, [color_col])
         else:
-            if not marker_col:  # there's a colorbar, just split by marker
-                raise ValueError(
-                    "marker_col needs to be specified as the datasize is in the figure!"
-                )
+            df_grouped, curve_dict = find_grouping(
+                fig, df_data, [color_col, marker_col]
+            )
 
-            df_grouped = df_data.groupby(marker_col)
-            groups = df_grouped.groups
-
-            if not test_groups(fig.data, groups):
-                raise ValueError(
-                    "marker_col is mispecified because the dataframe grouping names don't match the names in the plotly figure."
-                )
-
-        assert len(fig.data) == len(
-            df_grouped, "dataframe grouping doesn't match figure length."
-        )
         colors = {index: x.marker["color"] for index, x in enumerate(fig.data)}
-        # markers = {in}
-        if df[color_col].dtype == bool:
-            curve_dict = {
-                index: str2bool(x["name"]) for index, x in enumerate(fig.data)
-            }
-        elif df[color_col].dtype == int:
-            curve_dict = {index: int(x["name"]) for index, x in enumerate(fig.data)}
-        else:
-            curve_dict = {index: x["name"] for index, x in enumerate(fig.data)}
 
     app = JupyterDash(__name__)
     if isinstance(smiles_col, str):
@@ -198,12 +210,16 @@ def add_molecules(
         num = pt["pointNumber"]
         curve_num = pt["curveNumber"]
 
-        print(hoverData)
-        print(pt)
+        # print(hoverData)
+        # print(pt)
 
         if len(fig.data) != 1:
             # TODO replace with query
-            df_curve = df[df[color_col] == curve_dict[curve_num]].reset_index(drop=True)
+            # df_curve = df_grouped.get_group(curve_dict[curve_num]).reset_index(
+            #     drop=True
+            # )
+            df_curve = curve_dict[curve_num].reset_index(drop=True)
+            # df_curve = df[df[color_col] == curve_dict[curve_num]]
             df_row = df_curve.iloc[num]
         else:
             df_row = df.iloc[num]
