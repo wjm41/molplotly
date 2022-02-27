@@ -14454,6 +14454,11 @@ all of MD as it is not optimized for dense, information rich UIs.
 </style>
 
 <style type="text/css">
+/* Force rendering true colors when outputing to pdf */
+* {
+  -webkit-print-color-adjust: exact;
+}
+
 /* Misc */
 a.anchor-link {
   display: none;
@@ -14515,11 +14520,12 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
   width: 100%;
 }
 
-@media print {
-  .jp-Collapser {
-    display: none;
-  }
+/* Hiding the collapser by default */
+.jp-Collapser {
+  display: none;
+}
 
+@media print {
   .jp-Cell-inputWrapper,
   .jp-Cell-outputWrapper {
     display: block;
@@ -14615,7 +14621,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Let's load the ESOL dataset from <a href="https://doi.org/10.1021/ci034243x">ESOL: Estimating Aqueous Solubility Directly from Molecular Structure</a> (included as <code>example.csv</code> in the repo)</p>
+<p>Let's load the ESOL dataset from <a href="https://doi.org/10.1021/ci034243x">ESOL: Estimating Aqueous Solubility Directly from Molecular Structure</a> - helpfully hosted by the <a href="https://github.com/deepchem/deepchem">deepchem</a> team but also included as <code>example.csv</code> in the repo.</p>
 
 </div>
 </div>
@@ -14628,7 +14634,9 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df_esol</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;example.csv&#39;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># df_esol = pd.read_csv(&#39;example.csv&#39;)</span>
+<span class="n">df_esol</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="s1">&#39;https://raw.githubusercontent.com/deepchem/deepchem/master/datasets/delaney-processed.csv&#39;</span><span class="p">)</span>
 <span class="n">df_esol</span><span class="p">[</span><span class="s1">&#39;y_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_esol</span><span class="p">[</span><span class="s1">&#39;ESOL predicted log solubility in mols per litre&#39;</span><span class="p">]</span>
 <span class="n">df_esol</span><span class="p">[</span><span class="s1">&#39;y_true&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_esol</span><span class="p">[</span><span class="s1">&#39;measured log solubility in mols per litre&#39;</span><span class="p">]</span>
 </pre></div>
@@ -14645,23 +14653,12 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Simple-Examples">Simple Examples<a class="anchor-link" href="#Simple-Examples">&#182;</a></h1>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Let's make a scatter plot comparing the measured vs predicted solubilities using <a href="https://plotly.com/python/"><code>plotly</code></a></p>
+<p>Let's make a scatter plot comparing the measured vs predicted solubilities using <code>molplotly</code></p>
 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -14674,7 +14671,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
                          <span class="n">x</span><span class="o">=</span><span class="s2">&quot;y_true&quot;</span><span class="p">,</span>
                          <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y_pred&quot;</span><span class="p">,</span>
                          <span class="n">color</span><span class="o">=</span><span class="s1">&#39;delY&#39;</span><span class="p">,</span>
-                         <span class="n">title</span><span class="o">=</span><span class="s1">&#39;ESOL Regression (default plotly)&#39;</span><span class="p">,</span>
+                         <span class="n">title</span><span class="o">=</span><span class="s1">&#39;ESOL Regression (with add_molecules!)dddd&#39;</span><span class="p">,</span>
                          <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;y_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;Predicted Solubility&#39;</span><span class="p">,</span>
                                  <span class="s1">&#39;y_true&#39;</span><span class="p">:</span> <span class="s1">&#39;Measured Solubility&#39;</span><span class="p">,</span>
                                  <span class="s1">&#39;delY&#39;</span><span class="p">:</span> <span class="s1">&#39;ΔY&#39;</span><span class="p">},</span>
@@ -14689,44 +14686,15 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
     <span class="n">x1</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">y1</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 <span class="p">)</span>
 
-<span class="n">fig_scatter</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>now all we have to do is <code>add_molecules</code>!</p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig_scatter</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;ESOL Regression (with add_molecules!)&#39;</span><span class="p">)</span>
-
 <span class="n">app_scatter</span> <span class="o">=</span> <span class="n">molplotly</span><span class="o">.</span><span class="n">add_molecules</span><span class="p">(</span><span class="n">fig</span><span class="o">=</span><span class="n">fig_scatter</span><span class="p">,</span>
                                       <span class="n">df</span><span class="o">=</span><span class="n">df_esol</span><span class="p">,</span>
                                       <span class="n">smiles_col</span><span class="o">=</span><span class="s1">&#39;smiles&#39;</span><span class="p">,</span>
                                       <span class="n">title_col</span><span class="o">=</span><span class="s1">&#39;Compound ID&#39;</span>
                                       <span class="p">)</span>
 
+
 <span class="c1"># change the arguments here to run the dash app on an external server and/or change the size of the app!</span>
-<span class="n">app_scatter</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;inline&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8001</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">app_scatter</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;inline&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14734,548 +14702,39 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 </div>
 
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Cool right? Let's explore some more options:</p>
-<p>Apart from showing the $(x,y)$ coordinates (you can turn them off using <code>show_coords=False</code>), we can add extra values to show up in the mouse tooltip by specifying <code>caption_cols</code> - the values in these columns of <code>df_esol</code> are also shown in the hover box.</p>
-<p>We can also apply some function transformations to the captions via <code>caption_transform</code> - in this example, rounding all our numbers to 2 decimal places.</p>
 
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig_scatter</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
-    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;ESOL Regression (with add_molecules &amp; extra captions)&#39;</span><span class="p">)</span>
 
-<span class="n">app_scatter_with_captions</span> <span class="o">=</span> <span class="n">molplotly</span><span class="o">.</span><span class="n">add_molecules</span><span class="p">(</span><span class="n">fig</span><span class="o">=</span><span class="n">fig_scatter</span><span class="p">,</span>
-                                                    <span class="n">df</span><span class="o">=</span><span class="n">df_esol</span><span class="p">,</span>
-                                                    <span class="n">smiles_col</span><span class="o">=</span><span class="s1">&#39;smiles&#39;</span><span class="p">,</span>
-                                                    <span class="n">title_col</span><span class="o">=</span><span class="s1">&#39;Compound ID&#39;</span><span class="p">,</span>
-                                                    <span class="n">caption_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Molecular Weight&#39;</span><span class="p">,</span> <span class="s1">&#39;Number of Rings&#39;</span><span class="p">],</span>
-                                                    <span class="n">caption_transform</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Predicted Solubility&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                                                                       <span class="s1">&#39;Measured Solubility&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                                                                       <span class="s1">&#39;Molecular Weight&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
-                                                                       <span class="p">},</span>
-                                                    <span class="n">show_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="jp-OutputArea jp-Cell-outputArea">
 
-<span class="n">app_scatter_with_captions</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;inline&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8002</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-</pre></div>
+<div class="jp-OutputArea-child">
 
-     </div>
-</div>
-</div>
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+<div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output " data-mime-type="text/html">
+
+        <iframe
+            width="100%"
+            height="1000"
+            src="http://127.0.0.1:10000/"
+            frameborder="0"
+            allowfullscreen
+            
+        ></iframe>
+        
 </div>
 
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>What about adding colors? Here I've made an arbitrary random split of the dataset into <code>train</code> and <code>test</code>. When plotting, this leads to two separate plotly "curves" so the condition determining the color of the points needs to be passed in to the <code>add_molecules</code> function in order for the correct SMILES to be selected for visualisation - this is done via <code>color_col</code>. Notice that the <code>title</code> for the molecules in the hover box have the same color as the data point!</p>
-<p>For fun I also used the <code>size</code> argument in the scatter plot to change the size of the markers in proportion to the molecular weight.</p>
-<p>(notice I've been choosing different <code>port</code> numbers in all my plots, this is so that they don't interfere with each other!)</p>
 
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-
-<span class="n">train_inds</span><span class="p">,</span> <span class="n">test_inds</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">df_esol</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-<span class="n">df_esol</span><span class="p">[</span><span class="s1">&#39;dataset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;Train&#39;</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">train_inds</span> <span class="k">else</span> <span class="s1">&#39;Test&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df_esol</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
-
-<span class="n">fig_train_test</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df_esol</span><span class="p">,</span>
-                            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;y_true&quot;</span><span class="p">,</span>
-                            <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y_pred&quot;</span><span class="p">,</span>
-                            <span class="n">size</span><span class="o">=</span><span class="s1">&#39;Molecular Weight&#39;</span><span class="p">,</span>
-                            <span class="n">color</span><span class="o">=</span><span class="s1">&#39;dataset&#39;</span><span class="p">,</span>
-                            <span class="n">title</span><span class="o">=</span><span class="s1">&#39;ESOL Regression (colored by random train/test split)&#39;</span><span class="p">,</span>
-                            <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;y_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;Predicted Solubility&#39;</span><span class="p">,</span>
-                                    <span class="s1">&#39;y_true&#39;</span><span class="p">:</span> <span class="s1">&#39;Measured Solubility&#39;</span><span class="p">},</span>
-                            <span class="n">width</span><span class="o">=</span><span class="mi">1200</span><span class="p">,</span>
-                            <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
-<span class="c1"># fig.show()</span>
-<span class="n">app_train_test</span> <span class="o">=</span> <span class="n">molplotly</span><span class="o">.</span><span class="n">add_molecules</span><span class="p">(</span><span class="n">fig</span><span class="o">=</span><span class="n">fig_train_test</span><span class="p">,</span>
-                                         <span class="n">df</span><span class="o">=</span><span class="n">df_esol</span><span class="p">,</span>
-                                         <span class="n">smiles_col</span><span class="o">=</span><span class="s1">&#39;smiles&#39;</span><span class="p">,</span>
-                                         <span class="n">title_col</span><span class="o">=</span><span class="s1">&#39;Compound ID&#39;</span><span class="p">,</span>
-                                         <span class="n">color_col</span><span class="o">=</span><span class="s1">&#39;dataset&#39;</span><span class="p">)</span>
-
-<span class="n">app_train_test</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;inline&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8003</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
 </div>
 
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="More-complex-examples">More complex examples<a class="anchor-link" href="#More-complex-examples">&#182;</a></h1><p>Let's go beyond scatter plots and explore a few other graphs that might be relevant for cheminformatics, hopefully letting you see how <code>molplotly</code> could be useful for you when looking through (messy) data!</p>
 
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Strip-plots">Strip plots<a class="anchor-link" href="#Strip-plots">&#182;</a></h3><p>Strip plots are useful for visualising how the same property is distributed between data from different groups. Here I plot how the measured solubility changes with the number of rings on a molecule (it goes down, surprising I know).</p>
-<p>Violin plots can also useful for this purpose but it's not compatible with <code>plotly</code> (see section <a href="#violin">"violin plots"</a>)</p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig_strip</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">df_esol</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;Number of Rings&#39;</span><span class="p">),</span> <span class="c1"># sorting so that the colorbar is sorted!</span>
-                     <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Number of Rings&#39;</span><span class="p">,</span>
-                     <span class="n">y</span><span class="o">=</span><span class="s1">&#39;y_true&#39;</span><span class="p">,</span>
-                     <span class="n">color</span><span class="o">=</span><span class="s1">&#39;Number of Rings&#39;</span><span class="p">,</span>
-                     <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;y_true&#39;</span><span class="p">:</span> <span class="s1">&#39;Measured Solubility&#39;</span><span class="p">},</span>
-                     <span class="n">width</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-                     <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
-
-<span class="n">app_strip</span> <span class="o">=</span> <span class="n">molplotly</span><span class="o">.</span><span class="n">add_molecules</span><span class="p">(</span><span class="n">fig</span><span class="o">=</span><span class="n">fig_strip</span><span class="p">,</span>
-                          <span class="n">df</span><span class="o">=</span><span class="n">df_esol</span><span class="p">,</span>
-                          <span class="n">smiles_col</span><span class="o">=</span><span class="s1">&#39;smiles&#39;</span><span class="p">,</span>
-                          <span class="n">title_col</span><span class="o">=</span><span class="s1">&#39;Compound ID&#39;</span><span class="p">,</span>
-                          <span class="n">color_col</span><span class="o">=</span><span class="s1">&#39;Number of Rings&#39;</span><span class="p">,</span>
-                          <span class="n">caption_transform</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Measured Solubility&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
-                          <span class="n">wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                          <span class="n">wraplen</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-                          <span class="n">width</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>
-                          <span class="n">show_coords</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="n">app_strip</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;inline&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8004</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">850</span><span class="p">)</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Scatter-Matrices">Scatter Matrices<a class="anchor-link" href="#Scatter-Matrices">&#182;</a></h3><p>For visualising the relationship between multiple variables at once, use a matrix of scatter plots!</p>
-<p>Here I've increased the width of the hover box using the <code>width</code> parameter because the caption titles were getting long; also I've used <code>show_coords=False</code> because $(x, y)$ coordinates for non-trivial scatter plots become messy.</p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">features</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Number of H-Bond Donors&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Number of Rings&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Number of Rotatable Bonds&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Polar Surface Area&#39;</span><span class="p">]</span>
-<span class="n">fig_matrix</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span><span class="n">df_esol</span><span class="p">,</span>
-                               <span class="n">dimensions</span><span class="o">=</span><span class="n">features</span><span class="p">,</span>
-                               <span class="n">width</span><span class="o">=</span><span class="mi">1200</span><span class="p">,</span>
-                               <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
-                               <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Scatter matrix of molecular properties&#39;</span><span class="p">)</span>
-
-<span class="n">app_matrix</span> <span class="o">=</span> <span class="n">molplotly</span><span class="o">.</span><span class="n">add_molecules</span><span class="p">(</span><span class="n">fig</span><span class="o">=</span><span class="n">fig_matrix</span><span class="p">,</span>
-                                     <span class="n">df</span><span class="o">=</span><span class="n">df_esol</span><span class="p">,</span>
-                                     <span class="n">smiles_col</span><span class="o">=</span><span class="s1">&#39;smiles&#39;</span><span class="p">,</span>
-                                     <span class="n">title_col</span><span class="o">=</span><span class="s1">&#39;Compound ID&#39;</span><span class="p">,</span>
-                                     <span class="n">caption_cols</span><span class="o">=</span><span class="n">features</span><span class="p">,</span>
-                                     <span class="n">width</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-                                     <span class="n">show_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="c1"># Only show informative lower triangle</span>
-<span class="n">fig_matrix</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">diagonal_visible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">showupperhalf</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">app_matrix</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;inline&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8005</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Visualising-MorganFP-PCA-components">Visualising MorganFP PCA components<a class="anchor-link" href="#Visualising-MorganFP-PCA-components">&#182;</a></h3><p>A common way to visualise a molecular dataset is to calculate the morgan fingerprints of the molecules and visualise them in a 2D embedding (eg PCA/t-SNE). In this example I'm going to plot the 2 largest PCA components for ESOL and inspect the data.</p>
-
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Let's calculate the PCA components first!</p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
-<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span><span class="p">,</span> <span class="n">DataStructs</span>
-<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
-
-
-<span class="k">def</span> <span class="nf">smi_to_fp</span><span class="p">(</span><span class="n">smi</span><span class="p">):</span>
-    <span class="n">fp</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">GetMorganFingerprintAsBitVect</span><span class="p">(</span>
-        <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smi</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nBits</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
-    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
-    <span class="n">DataStructs</span><span class="o">.</span><span class="n">ConvertToNumpyArray</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">arr</span>
-
-<span class="n">esol_fps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">smi_to_fp</span><span class="p">(</span><span class="n">smi</span><span class="p">)</span> <span class="k">for</span> <span class="n">smi</span> <span class="ow">in</span> <span class="n">df_esol</span><span class="p">[</span><span class="s1">&#39;smiles&#39;</span><span class="p">]])</span>
-<span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">components</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">esol_fps</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1024</span><span class="p">))</span>
-<span class="n">df_esol</span><span class="p">[</span><span class="s1">&#39;PCA-1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-<span class="n">df_esol</span><span class="p">[</span><span class="s1">&#39;PCA-2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">components</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>and now let's look at them!</p>
-<p>with <code>molplotly</code>, it's super easy to see which molecules are where - steroid molecules at the top, alcohols in the bottom left, chlorinated aromatic compounds in the bottom right.</p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig_pca</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df_esol</span><span class="p">,</span>
-                     <span class="n">x</span><span class="o">=</span><span class="s2">&quot;PCA-1&quot;</span><span class="p">,</span>
-                     <span class="n">y</span><span class="o">=</span><span class="s2">&quot;PCA-2&quot;</span><span class="p">,</span>
-                     <span class="n">color</span><span class="o">=</span><span class="s1">&#39;y_true&#39;</span><span class="p">,</span>
-                     <span class="n">title</span><span class="o">=</span><span class="s1">&#39;ESOL PCA of morgan fingerprints&#39;</span><span class="p">,</span>
-                     <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;y_true&#39;</span><span class="p">:</span> <span class="s1">&#39;Measured Solubility&#39;</span><span class="p">},</span>
-                     <span class="n">width</span><span class="o">=</span><span class="mi">1200</span><span class="p">,</span>
-                     <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
-
-<span class="n">app_pca</span> <span class="o">=</span> <span class="n">molplotly</span><span class="o">.</span><span class="n">add_molecules</span><span class="p">(</span><span class="n">fig</span><span class="o">=</span><span class="n">fig_pca</span><span class="p">,</span>
-                                  <span class="n">df</span><span class="o">=</span><span class="n">df_esol</span><span class="p">,</span>
-                                  <span class="n">smiles_col</span><span class="o">=</span><span class="s1">&#39;smiles&#39;</span><span class="p">,</span>
-                                  <span class="n">title_col</span><span class="o">=</span><span class="s1">&#39;Compound ID&#39;</span><span class="p">,</span>
-                                  <span class="n">caption_cols</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;y_true&#39;</span><span class="p">],</span>
-                                  <span class="n">color_col</span><span class="o">=</span><span class="s1">&#39;y_true&#39;</span><span class="p">,</span>
-                                  <span class="n">show_coords</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">app_pca</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;inline&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8006</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">850</span><span class="p">)</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Clustering">Clustering<a class="anchor-link" href="#Clustering">&#182;</a></h3><p>Let's do some clustering of the ESOL molecules, borrowing useful functions from Pat Walters' excellent blog post on <a href="http://practicalcheminformatics.blogspot.com/2021/11/picking-highest-scoring-molecules-from.html">clustering</a>.</p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">rdkit.ML.Cluster</span> <span class="kn">import</span> <span class="n">Butina</span>
-
-<span class="k">def</span> <span class="nf">smi2fp</span><span class="p">(</span><span class="n">smi</span><span class="p">):</span>
-    <span class="n">fp</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">GetMorganFingerprintAsBitVect</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smi</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">fp</span>
-
-
-<span class="k">def</span> <span class="nf">taylor_butina_clustering</span><span class="p">(</span><span class="n">fp_list</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.35</span><span class="p">):</span>
-    <span class="n">dists</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">nfps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fp_list</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nfps</span><span class="p">):</span>
-        <span class="n">sims</span> <span class="o">=</span> <span class="n">DataStructs</span><span class="o">.</span><span class="n">BulkTanimotoSimilarity</span><span class="p">(</span><span class="n">fp_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fp_list</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span>
-        <span class="n">dists</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="mi">1</span><span class="o">-</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sims</span><span class="p">])</span>
-    <span class="n">mol_clusters</span> <span class="o">=</span> <span class="n">Butina</span><span class="o">.</span><span class="n">ClusterData</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">nfps</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">isDistData</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">mol_clusters</span>
-
-
-<span class="n">cluster_res</span> <span class="o">=</span> <span class="n">taylor_butina_clustering</span><span class="p">(</span>
-    <span class="p">[</span><span class="n">smi2fp</span><span class="p">(</span><span class="n">smi</span><span class="p">)</span> <span class="k">for</span> <span class="n">smi</span> <span class="ow">in</span> <span class="n">df_esol</span><span class="p">[</span><span class="s1">&#39;smiles&#39;</span><span class="p">]])</span>
-<span class="n">cluster_id_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df_esol</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">cluster_num</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cluster_res</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">:</span>
-        <span class="n">cluster_id_list</span><span class="p">[</span><span class="n">member</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster_num</span>
-<span class="n">df_esol</span><span class="p">[</span><span class="s1">&#39;cluster&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster_id_list</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>Now let's make a strip plot of the top-10 clusters, see what they look like and how soluable they are!</p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df_cluster</span> <span class="o">=</span> <span class="n">df_esol</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;cluster &lt; 10&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-<span class="c1"># sorting is needed to make the legend appear in order!</span>
-<span class="n">df_cluster</span> <span class="o">=</span> <span class="n">df_cluster</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;cluster&#39;</span><span class="p">)</span>
-
-<span class="n">fig_cluster</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="n">df_cluster</span><span class="p">,</span>
-                      <span class="n">y</span><span class="o">=</span><span class="s1">&#39;y_true&#39;</span><span class="p">,</span>
-                      <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cluster&#39;</span><span class="p">,</span>
-                      <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;y_true&#39;</span><span class="p">:</span> <span class="s1">&#39;Measured Solubility&#39;</span><span class="p">},</span>
-                      <span class="n">width</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-                      <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
-
-<span class="n">app_cluster</span> <span class="o">=</span> <span class="n">molplotly</span><span class="o">.</span><span class="n">add_molecules</span><span class="p">(</span><span class="n">fig</span><span class="o">=</span><span class="n">fig_cluster</span><span class="p">,</span>
-                           <span class="n">df</span><span class="o">=</span><span class="n">df_cluster</span><span class="p">,</span>
-                           <span class="n">smiles_col</span><span class="o">=</span><span class="s1">&#39;smiles&#39;</span><span class="p">,</span>
-                           <span class="n">title_col</span><span class="o">=</span><span class="s1">&#39;Compound ID&#39;</span><span class="p">,</span>
-                           <span class="n">color_col</span><span class="o">=</span><span class="s1">&#39;cluster&#39;</span>
-                           <span class="p">)</span>
-
-<span class="n">app_cluster</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;inline&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8007</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">850</span><span class="p">)</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Incompatible-plotly-functionality-with-molplotly">Incompatible <code>plotly</code> functionality with molplotly<a class="anchor-link" href="#Incompatible-plotly-functionality-with-molplotly">&#182;</a></h1><p><code>Plotly</code> is a graphing library that does far more than just scatter plots - it has lots of cool functionalities that unfortunately clash with how <code>molplotly</code> implements the hover box (for now at least). Here are some examples of known incompatibilities, which are still very useful data visualisations in vanilla <code>plotly</code>!</p>
-
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Marginals-on-scatter-plots">Marginals on scatter plots<a class="anchor-link" href="#Marginals-on-scatter-plots">&#182;</a></h3><p>I like having marginals on the sides by default because the data density in a dataset can often vary a lot. Anything to do with histogram/violin plots don't work yet with <code>molplotly</code>.</p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig_marginal</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df_esol</span><span class="p">,</span>
-                 <span class="n">x</span><span class="o">=</span><span class="s2">&quot;y_true&quot;</span><span class="p">,</span>
-                 <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y_pred&quot;</span><span class="p">,</span>
-                 <span class="n">title</span><span class="o">=</span><span class="s1">&#39;ESOL Regression (with histogram marginals)&#39;</span><span class="p">,</span>
-                 <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;y_pred&#39;</span><span class="p">:</span> <span class="s1">&#39;Predicted Solubility&#39;</span><span class="p">,</span>
-                         <span class="s1">&#39;y_true&#39;</span><span class="p">:</span> <span class="s1">&#39;Measured Solubility&#39;</span><span class="p">},</span>
-                 <span class="n">marginal_x</span><span class="o">=</span><span class="s1">&#39;violin&#39;</span><span class="p">,</span>
-                 <span class="n">marginal_y</span><span class="o">=</span><span class="s1">&#39;histogram&#39;</span><span class="p">,</span>
-                 <span class="n">width</span><span class="o">=</span><span class="mi">1200</span><span class="p">,</span>
-                 <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
-<span class="n">fig_marginal</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Violin-plots">Violin plots<a class="anchor-link" href="#Violin-plots">&#182;</a></h3><p>The aesthetic of violin plots are nice, especially when there's a lot of datapoints but if there's not much data (often the case in drug discovery!) then those nice smooth KDE curves can be misleading so I usually prefer strip plots. <code>plotly</code> has cool mouseover data on violin plots which are incompatible with <code>molplotly</code> but at least if there's enough data that I prefer using a violin plot, it's probably too memory consuming to run a strip plot with <code>molplotly</code> anyway!</p>
-<p><a name="violin"></a></p>
-
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig_violin</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">violin</span><span class="p">(</span><span class="n">df_esol</span><span class="p">,</span>
-                       <span class="n">y</span><span class="o">=</span><span class="s2">&quot;y_true&quot;</span><span class="p">,</span>
-                       <span class="n">title</span><span class="o">=</span><span class="s1">&#39;ESOL violin plot of measured solubility&#39;</span><span class="p">,</span>
-                       <span class="n">labels</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;y_true&#39;</span><span class="p">:</span> <span class="s1">&#39;Measured Solubility&#39;</span><span class="p">},</span>
-                       <span class="n">box</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                       <span class="n">points</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
-                       <span class="n">width</span><span class="o">=</span><span class="mi">1200</span><span class="p">,</span>
-                       <span class="n">height</span><span class="o">=</span><span class="mi">800</span><span class="p">)</span>
-<span class="n">fig_violin</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h1 id="Other-notes">Other notes<a class="anchor-link" href="#Other-notes">&#182;</a></h1>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3>💾 &nbsp; Can I save these plots?</h3>
-
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p><code>moltplotly</code> works using a Dash app which is non-trivial to export because server side javascript is needed in addition to HTML/CSS styling (<a href="https://stackoverflow.com/questions/60097577/how-to-export-a-plotly-dashboard-app-into-a-html-standalone-file-to-share-with-t">as detailed here</a>)</p>
-<p>Until I find a way to get around that, the best alternative is exporting the plotly figure without molecules showing :( as detailed in this <a href="https://plotly.com/python/interactive-html-export/">page</a>. If you want to use it in a presentation I'd suggest keeping the figure open in a browser and changing windows to it during your talk!</p>
-
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3>🛑 &nbsp;Warning about memory size</h3>
-<p>Just adding a warning here that memory usage in a notebook can increase significanly when using plotly (not <code>molplotly</code>'s fault!). If you notice your jupyter notebook slowing down, plotly itself is a likely culprit... In that case I'd consider either using plotly with <a href="https://plotly.com/python/renderers/#static-image-renderers">static image rendering</a>, or ... use <a href="https://seaborn.pydata.org/index.html">seaborn</a> :P</p>
-
-</div>
-</div>
-</div>
 </div>
 </body>
 

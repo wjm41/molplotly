@@ -2,5 +2,9 @@ setup*
 MANIFEST
 dist/
 molplotly.egg-info/
-
+example.md
 *.pyc
+settings.json
+.DS_Store
+
+target/
