@@ -4,3 +4,5 @@ dist/
 molplotly.egg-info/
 
 *.pyc
+.DS_Store
+settings.json
