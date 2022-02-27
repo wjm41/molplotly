@@ -95,34 +95,49 @@ def add_molecules(
                 "color_col needs to be specified if there is more than one plotly curve in the figure!"
             )
 
-    app = JupyterDash(__name__)    
+    app = JupyterDash(__name__)
     if isinstance(smiles_col, str):
         smiles_col = [smiles_col]
-    
-    if len(smiles_col)>1:
-        slider = dcc.Slider(min=0, max=len(smiles_col)-1, step=1, marks={i:smiles_col[i] for i in range(len(smiles_col))}, value=0,
-                    id='smiles-slider')
+
+    if len(smiles_col) > 1:
+        menu = dcc.Dropdown(
+            options=[{"label": x, "value": x} for x in smiles_col],
+            value=smiles_col[0],
+            multi=True,
+            id="smiles-menu",
+            placeholder="Select a SMILES column to display",
+        )
     else:
-        slider = dcc.Store(id='smiles-slider', data=0)
-    
-    app.layout = html.Div([
-    dcc.Graph(id="graph-basic-2", figure=fig, clear_on_unhover=True),
-    dcc.Tooltip(
+        menu = dcc.Store(id="smiles-menu", data=0)
+    app.layout = html.Div(
+        [
+            menu,
+            dcc.Graph(id="graph-basic-2", figure=fig, clear_on_unhover=True),
+            dcc.Tooltip(
                 id="graph-tooltip", background_color=f"rgba(255,255,255,{alpha})"
             ),
-    slider
-    ])
+        ]
+    )
 
     @app.callback(
-        output=[Output("graph-tooltip", "show"), Output("graph-tooltip",
-                                                        "bbox"), Output("graph-tooltip", "children")],
-        inputs=[Input("graph-basic-2", "hoverData"), Input("smiles-slider", "value")]
+        output=[
+            Output("graph-tooltip", "show"),
+            Output("graph-tooltip", "bbox"),
+            Output("graph-tooltip", "children"),
+        ],
+        inputs=[Input("graph-basic-2", "hoverData"), Input("smiles-menu", "value")],
     )
     def display_hover(hoverData, value):
         if hoverData is None:
             return False, no_update, no_update
+
         if value is None:
-            value = 0
+            value = smiles_col
+        if isinstance(value, str):
+            chosen_smiles = [value]
+        else:
+            chosen_smiles = value
+
         pt = hoverData["points"][0]
         bbox = pt["bbox"]
         num = pt["pointNumber"]
@@ -137,30 +152,43 @@ def add_molecules(
         hoverbox_elements = []
 
         if show_img:
-            # The 2D image of the molecule is generated here
-            smiles = df_row[smiles_col[value]]
-            buffered = BytesIO()
-            img = Chem.Draw.MolToImage(Chem.MolFromSmiles(smiles))
-            d2d = rdMolDraw2D.MolDraw2DSVG(svg_size, svg_size)
-            opts = d2d.drawOptions()
-            opts.clearBackground = False
-            d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
-            d2d.FinishDrawing()
-            img_str = d2d.GetDrawingText()
-            buffered.write(str.encode(img_str))
-            img_str = base64.b64encode(buffered.getvalue())
+            # # The 2D image of the molecule is generated here
+            for col in chosen_smiles:
+                # if col in chosen_smiles:
+                # print(df_row)
+                smiles = df_row[col]
+                buffered = BytesIO()
+                d2d = rdMolDraw2D.MolDraw2DSVG(svg_size, svg_size)
+                opts = d2d.drawOptions()
+                opts.clearBackground = False
+                d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
+                d2d.FinishDrawing()
+                img_str = d2d.GetDrawingText()
+                buffered.write(str.encode(img_str))
+                img_str = base64.b64encode(buffered.getvalue())
+                img_str = "data:image/svg+xml;base64,{}".format(repr(img_str)[2:-1])
+                # img_str = df_data.query(f"{col} == @smiles")[f"{col}_img"].values[0]
 
-            img_str = "data:image/svg+xml;base64,{}".format(repr(img_str)[2:-1])
-
-            hoverbox_elements.append(
-                html.Img(
-                    src=img_str,
-                    style={
-                        "width": "100%",
-                        "background-color": f"rgba(255,255,255,{mol_alpha})",
-                    },
+                if len(smiles_col) > 1:
+                    hoverbox_elements.append(
+                        html.H2(
+                            f"{col}",
+                            style={
+                                "color": colors[curve_num],
+                                "font-family": fontfamily,
+                                "fontSize": fontsize + 2,
+                            },
+                        )
+                    )
+                hoverbox_elements.append(
+                    html.Img(
+                        src=img_str,
+                        style={
+                            "width": "100%",
+                            "background-color": f"rgba(255,255,255,{mol_alpha})",
+                        },
+                    )
                 )
-            )
 
         if title_col is not None:
             title = df_row[title_col]
@@ -170,12 +198,12 @@ def add_molecules(
                 else:
                     title = title[:wraplen] + "..."
             hoverbox_elements.append(
-                html.H2(
+                html.H4(
                     f"{title}",
                     style={
                         "color": colors[curve_num],
                         "font-family": fontfamily,
-                        "fontSize": fontsize + 2,
+                        "fontSize": fontsize,
                     },
                 )
             )
