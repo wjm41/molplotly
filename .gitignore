@@ -1,5 +1,10 @@
+# Setup files for pypi
 MANIFEST
 dist/
 molplotly.egg-info/
+setup.cfg
 
+# VS-Code files
 *.pyc
+.DS_Store
+settings.json

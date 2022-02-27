@@ -4,7 +4,9 @@ import base64
 import textwrap
 from PIL import ImageFont
 
+import numpy as np
 from rdkit import Chem
+from rdkit.Chem.Draw import rdMolDraw2D
 
 from jupyter_dash import JupyterDash
 
@@ -16,23 +18,28 @@ def str2bool(v):
     return v.lower() in ("yes", "true", "t", "1")
 
 
-def add_molecules(fig,
-                  df,
-                  smiles_col='SMILES',
-                  show_img=True,
-                  title_col=None,
-                  show_coords=True,
-                  caption_cols=None,
-                  caption_transform={},
-                  color_col=None,
-                  wrap=True,
-                  wraplen=20,
-                  width=150,
-                  fontfamily='Arial',
-                  fontsize=12):
+def add_molecules(
+    fig,
+    df,
+    smiles_col="SMILES",
+    show_img=True,
+    svg_size=200,
+    alpha=0.75,
+    mol_alpha=0.7,
+    title_col=None,
+    show_coords=True,
+    caption_cols=None,
+    caption_transform={},
+    color_col=None,
+    wrap=True,
+    wraplen=20,
+    width=150,
+    fontfamily="Arial",
+    fontsize=12,
+):
     """
-    A function that takes a plotly figure and a dataframe with molecular SMILES 
-    and returns a dash app that dynamically generates an image of molecules in the hover box 
+    A function that takes a plotly figure and a dataframe with molecular SMILES
+    and returns a dash app that dynamically generates an image of molecules in the hover box
     when hovering the mouse over datapoints.
     ...
 
@@ -71,26 +78,24 @@ def add_molecules(fig,
     """
     fig.update_traces(hoverinfo="none", hovertemplate=None)
 
-    colors = {0: 'black'}
+    colors = {0: "black"}
     if len(fig.data) != 1:
         if color_col is not None:
-            colors = {index: x.marker['color']
-                      for index, x in enumerate(fig.data)}
+            colors = {index: x.marker["color"] for index, x in enumerate(fig.data)}
             if df[color_col].dtype == bool:
-                curve_dict = {index: str2bool(x['name'])
-                              for index, x in enumerate(fig.data)}
+                curve_dict = {
+                    index: str2bool(x["name"]) for index, x in enumerate(fig.data)
+                }
             elif df[color_col].dtype == int:
-                curve_dict = {index: int(x['name'])
-                              for index, x in enumerate(fig.data)}
+                curve_dict = {index: int(x["name"]) for index, x in enumerate(fig.data)}
             else:
-                curve_dict = {index: x['name']
-                              for index, x in enumerate(fig.data)}
+                curve_dict = {index: x["name"] for index, x in enumerate(fig.data)}
         else:
             raise ValueError(
-                'color_col needs to be specified if there is more than one plotly curve in the figure!')
+                "color_col needs to be specified if there is more than one plotly curve in the figure!"
+            )
 
-    app = JupyterDash(__name__)
-    
+    app = JupyterDash(__name__)    
     if isinstance(smiles_col, str):
         smiles_col = [smiles_col]
     
@@ -102,10 +107,11 @@ def add_molecules(fig,
     
     app.layout = html.Div([
     dcc.Graph(id="graph-basic-2", figure=fig, clear_on_unhover=True),
-    dcc.Tooltip(id="graph-tooltip"),
+    dcc.Tooltip(
+                id="graph-tooltip", background_color=f"rgba(255,255,255,{alpha})"
+            ),
     slider
     ])
-
 
     @app.callback(
         output=[Output("graph-tooltip", "show"), Output("graph-tooltip",
@@ -120,10 +126,10 @@ def add_molecules(fig,
         pt = hoverData["points"][0]
         bbox = pt["bbox"]
         num = pt["pointNumber"]
-        curve_num = pt['curveNumber']
+        curve_num = pt["curveNumber"]
+
         if len(fig.data) != 1:
-            df_curve = df[df[color_col] ==
-                          curve_dict[curve_num]].reset_index(drop=True)
+            df_curve = df[df[color_col] == curve_dict[curve_num]].reset_index(drop=True)
             df_row = df_curve.iloc[num]
         else:
             df_row = df.iloc[num]
@@ -135,12 +141,26 @@ def add_molecules(fig,
             smiles = df_row[smiles_col[value]]
             buffered = BytesIO()
             img = Chem.Draw.MolToImage(Chem.MolFromSmiles(smiles))
-            img.save(buffered, format="PNG")
+            d2d = rdMolDraw2D.MolDraw2DSVG(svg_size, svg_size)
+            opts = d2d.drawOptions()
+            opts.clearBackground = False
+            d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
+            d2d.FinishDrawing()
+            img_str = d2d.GetDrawingText()
+            buffered.write(str.encode(img_str))
             img_str = base64.b64encode(buffered.getvalue())
-            img_str = "data:image/png;base64,{}".format(
-                repr(img_str)[2:-1])
+
+            img_str = "data:image/svg+xml;base64,{}".format(repr(img_str)[2:-1])
+
             hoverbox_elements.append(
-                html.Img(src=img_str, style={"width": "100%"}))
+                html.Img(
+                    src=img_str,
+                    style={
+                        "width": "100%",
+                        "background-color": f"rgba(255,255,255,{mol_alpha})",
+                    },
+                )
+            )
 
         if title_col is not None:
             title = df_row[title_col]
@@ -148,39 +168,101 @@ def add_molecules(fig,
                 if wrap:
                     title = textwrap.fill(title, width=wraplen)
                 else:
-                    title = title[:wraplen] + '...'
+                    title = title[:wraplen] + "..."
             hoverbox_elements.append(
-                html.H2(f"{title}", style={"color": colors[curve_num],
-                        "font-family": fontfamily, "fontSize": fontsize+2}))
+                html.H2(
+                    f"{title}",
+                    style={
+                        "color": colors[curve_num],
+                        "font-family": fontfamily,
+                        "fontSize": fontsize + 2,
+                    },
+                )
+            )
         if show_coords:
             x_label = fig.layout.xaxis.title.text
             y_label = fig.layout.yaxis.title.text
             if x_label in caption_transform:
-                style_str = caption_transform[x_label](pt['x'])
-                hoverbox_elements.append(html.P(f"{x_label} : {style_str}",
-                                                style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
+                style_str = caption_transform[x_label](pt["x"])
+                hoverbox_elements.append(
+                    html.P(
+                        f"{x_label} : {style_str}",
+                        style={
+                            "color": "black",
+                            "font-family": fontfamily,
+                            "fontSize": fontsize,
+                        },
+                    )
+                )
             else:
-                hoverbox_elements.append(html.P(f"{x_label}: {pt['x']}",
-                                                style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
+                hoverbox_elements.append(
+                    html.P(
+                        f"{x_label}: {pt['x']}",
+                        style={
+                            "color": "black",
+                            "font-family": fontfamily,
+                            "fontSize": fontsize,
+                        },
+                    )
+                )
             if y_label in caption_transform:
-                style_str = caption_transform[y_label](pt['y'])
-                hoverbox_elements.append(html.P(f"{y_label} : {style_str}",
-                                                style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
+                style_str = caption_transform[y_label](pt["y"])
+                hoverbox_elements.append(
+                    html.P(
+                        f"{y_label} : {style_str}",
+                        style={
+                            "color": "black",
+                            "font-family": fontfamily,
+                            "fontSize": fontsize,
+                        },
+                    )
+                )
             else:
-                hoverbox_elements.append(html.P(f"{y_label} : {pt['y']}",
-                                                style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
+                hoverbox_elements.append(
+                    html.P(
+                        f"{y_label} : {pt['y']}",
+                        style={
+                            "color": "black",
+                            "font-family": fontfamily,
+                            "fontSize": fontsize,
+                        },
+                    )
+                )
         if caption_cols is not None:
             for caption in caption_cols:
                 caption_val = df_row[caption]
                 if caption in caption_transform:
                     style_str = caption_transform[caption](caption_val)
-                    hoverbox_elements.append(html.P(f"{caption} : {style_str}",
-                                                    style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
+                    hoverbox_elements.append(
+                        html.P(
+                            f"{caption} : {style_str}",
+                            style={
+                                "color": "black",
+                                "font-family": fontfamily,
+                                "fontSize": fontsize,
+                            },
+                        )
+                    )
                 else:
-                    hoverbox_elements.append(html.P(f"{caption} : {caption_val}",
-                                                    style={"color": "black", "font-family": fontfamily, "fontSize": fontsize}))
-        children = [html.Div(hoverbox_elements, style={
-            'width': f'{width}px', 'white-space': 'normal'})]
+                    hoverbox_elements.append(
+                        html.P(
+                            f"{caption} : {caption_val}",
+                            style={
+                                "color": "black",
+                                "font-family": fontfamily,
+                                "fontSize": fontsize,
+                            },
+                        )
+                    )
+        children = [
+            html.Div(
+                hoverbox_elements,
+                style={
+                    "width": f"{width}px",
+                    "white-space": "normal",
+                },
+            )
+        ]
 
         return True, bbox, children
 
