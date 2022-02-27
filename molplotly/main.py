@@ -25,7 +25,7 @@ def add_molecules(
     show_img=True,
     svg_size=200,
     alpha=0.75,
-    img_alpha=0.7,
+    mol_alpha=0.7,
     title_col=None,
     show_coords=True,
     caption_cols=None,
@@ -149,7 +149,7 @@ def add_molecules(
                     src=img_str,
                     style={
                         "width": "100%",
-                        "background-color": f"rgba(255,255,255,{img_alpha})",
+                        "background-color": f"rgba(255,255,255,{mol_alpha})",
                     },
                 )
             )
