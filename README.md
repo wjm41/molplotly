@@ -1,5 +1,7 @@
 # molplotly
 
+<!-- TODO tests -->
+
 [![Powered by RDKit](https://img.shields.io/static/v1?label=Powered%20by&message=RDKit&color=3838ff&style=flat&logo=data:image/x-icon;base64,AAABAAEAEBAQAAAAAABoAwAAFgAAACgAAAAQAAAAIAAAAAEAGAAAAAAAAAMAABILAAASCwAAAAAAAAAAAADc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/FBT/FBT/FBT/FBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/PBT/PBT/PBT/PBT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/jIz/jIz/jIz/jIz/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/jIz/jIz/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/tLT/tLT/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/tLT/tLT/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/jIz/jIz/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/jIz/jIz/jIz/jIz/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/PBT/PBT/PBT/PBT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/FBT/FBT/FBT/FBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/////+B////AP///gB///wAP//4AB//+AAf//gAH//4AB//+AAf//gAH//8AD///gB///8A////gf////////)](https://www.rdkit.org/)
 [![PyPI version](https://img.shields.io/pypi/v/molplotly)](https://pypi.python.org/pypi/molplotly)
 
@@ -9,7 +11,7 @@
 ![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/pca.gif)
 ![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/multiple_smiles.gif)
 
-➡️ &nbsp;A readable walkthrough of how to use the package together with some useful examples can be found in [this blog post](https://www.wmccorkindale.com/post/introducing-molplotly) while a runnable notebook can be found in `example.ipynb` :)
+➡️ &nbsp;A readable walkthrough of how to use the package together with some useful examples can be found in [this blog post](https://www.wmccorkindale.com/post/introducing-molplotly) while a runnable notebook can be found in `examples/example.ipynb` :)
 
 ## ⬇️ Installation
 
@@ -27,7 +29,8 @@ import plotly.express as px
 import molplotly
 
 # load a DataFrame with smiles
-df_esol = pd.read_csv('esol.csv')
+df_esol = pd.read_csv(
+    'https://raw.githubusercontent.com/deepchem/deepchem/master/datasets/delaney-processed.csv')
 df_esol['y_pred'] = df_esol['ESOL predicted log solubility in mols per litre']
 df_esol['y_true'] = df_esol['measured log solubility in mols per litre']
 
@@ -46,6 +49,8 @@ app.run_server(mode='inline', port=8011, height=1000)
 ```
 
 #### Input parameters
+
+<!-- TODO update params -->
 
 - `fig` : plotly.graph_objects.Figure object\
     a plotly figure object containing datapoints plotted from df
@@ -79,6 +84,8 @@ app.run_server(mode='inline', port=8011, height=1000)
 
 #### Output parameters
 
+<!-- TODO update about port numbers -->
+
 by default a JupyterDash `app` is returned which can be run inline in a jupyter notebook or deployed on a server via `app.run_server()`
 
 - The recommended `height` of the app is `50+(height of the plotly figure)`.
@@ -86,9 +93,13 @@ by default a JupyterDash `app` is returned which can be run inline in a jupyter 
 
 ## 💻 &nbsp; Can I run this in colab?
 
+<!-- TODO Update with fix -->
+
 JupyterDash is supposed to have support for Google Colab but at some point that seems to have broken... Keep an eye on the raised issue [here](https://github.com/plotly/jupyter-dash/issues/10)!
 
 ## 💾 &nbsp; Can I save these plots?
+
+<!-- TODO Update & link to issue -->
 
 `moltplotly` works using a Dash app which is non-trivial to export because server side javascript is needed in addition to HTML/CSS styling ([as detailed here](https://stackoverflow.com/questions/60097577/how-to-export-a-plotly-dashboard-app-into-a-html-standalone-file-to-share-with-t))
 
