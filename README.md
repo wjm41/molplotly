@@ -1,7 +1,5 @@
 # molplotly
 
-<!-- TODO tests -->
-
 [![Powered by RDKit](https://img.shields.io/static/v1?label=Powered%20by&message=RDKit&color=3838ff&style=flat&logo=data:image/x-icon;base64,AAABAAEAEBAQAAAAAABoAwAAFgAAACgAAAAQAAAAIAAAAAEAGAAAAAAAAAMAABILAAASCwAAAAAAAAAAAADc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/FBT/FBT/FBT/FBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/PBT/PBT/PBT/PBT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/jIz/jIz/jIz/jIz/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/jIz/jIz/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/tLT/tLT/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/tLT/tLT/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/jIz/jIz/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/jIz/jIz/jIz/jIz/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/PBT/PBT/PBT/PBT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/FBT/FBT/FBT/FBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/////+B////AP///gB///wAP//4AB//+AAf//gAH//4AB//+AAf//gAH//8AD///gB///8A////gf////////)](https://www.rdkit.org/)
 [![PyPI version](https://img.shields.io/pypi/v/molplotly)](https://pypi.python.org/pypi/molplotly)
 
@@ -50,37 +48,43 @@ app.run_server(mode='inline', port=8011, height=1000)
 
 #### Input parameters
 
-<!-- TODO update params -->
-
 - `fig` : plotly.graph_objects.Figure object\
-    a plotly figure object containing datapoints plotted from df
+    a plotly figure object containing datapoints plotted from `df`.
 
 - `df` : pandas.DataFrame object\
-    a pandas dataframe that contains the data plotted in fig
+    a pandas dataframe that contains the data plotted in `fig`.
 - `smiles_col` : str, optional\
-    name of the column in df containing the smiles plotted in fig (default 'SMILES')
+    name of the column in df containing the smiles plotted in `fig` (default 'SMILES').
 - `show_img` : bool, optional\
-    whether or not to generate the molecule image in the dash app (default True)
+    whether or not to generate the molecule image in the dash app (default True).
+- `svg_size` : float, optional
+        the size in pixels of the molecule drawing (default 200).
+- `alpha` : float, optional\
+    the transparency of the hoverbox, 0 for full transparency 1 for full opaqueness (default 0.7).
+- `mol_alpha` : float, optional\
+    the transparency of the SVG molecule image, 0 for full transparency 1 for full opaqueness (default 0.7).
 - `title_col` : str, optional\
-    name of the column in df to be used as the title entry in the hover box (default None)
+    name of the column in df to be used as the title entry in the hover box (default None).
 - `show_coords` : bool, optional\
-    whether or not to show the coordinates of the data point in the hover box (default True)
+    whether or not to show the coordinates of the data point in the hover box (default True).
 - `caption_cols` : list, optional\
-    list of column names in df to be included in the hover box (default None)
+    list of column names in df to be included in the hover box (default None).
 - `caption_transform` : dict, optional\
-    Functions applied to specific items in all cells. The dict must follow a key: function structure where the key must correspond to one of the columns in subset or tooltip. (default {})
+    Functions applied to captions for formatting. The dict must follow a key: function structure where the key must correspond to one of the columns in subset or tooltip (default {}).
 - `color_col` : str, optional\
-    name of the column in df that is used to color the datapoints in df - necessary when there is discrete conditional coloring (default None)
+    name of the column in df that is used to color the datapoints in df - necessary when there is discrete conditional coloring (default None).
+- `marker_col` : str, optional\
+    name of the column in df that is used to determine the marker shape of the datapoints in df (default None).
 - `wrap` : bool, optional\
-    whether or not to wrap the title text to multiple lines if the length of the text is too long (default True)
+    whether or not to wrap the title text to multiple lines if the length of the text is too long (default True).
 - `wraplen` : int, optional\
-    the threshold length of the title text before wrapping begins - adjust when changing the width of the hover box (default 20)
+    the threshold length of the title text before wrapping begins - adjust when changing the width of the hover box (default 20).
 - `width` : int, optional\
-    the width in pixels of the hover box (default 150)
+    the width in pixels of the hover box (default 150).
 - `fontfamily` : str, optional\
-    the font family used in the hover box (default 'Arial')
+    the font family used in the hover box (default 'Arial').
 - `fontsize` : int, optional\
-    the font size used in the hover box - the font of the title line is fontsize+2 (default 12)
+    the font size used in the hover box - the font of the title line is fontsize+2 (default 12).
 
 #### Output parameters
 
