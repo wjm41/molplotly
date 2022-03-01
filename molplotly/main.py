@@ -30,8 +30,6 @@ def test_groups(fig, df_grouped):
     """
     str_groups = {}
     for name, group in df_grouped:
-        # if isinstance(name, bool) or isinstance(name, int):
-        #     str_groups[str(name)] = group
         if isinstance(name, tuple):
             str_groups[", ".join(str(x) for x in name)] = group
         else:
@@ -199,7 +197,7 @@ def add_molecules(
     def display_hover(hoverData, value):
         if hoverData is None:
             return False, no_update, no_update
-
+        print(value)
         if value is None:
             value = smiles_col
         if isinstance(value, str):
@@ -212,16 +210,8 @@ def add_molecules(
         num = pt["pointNumber"]
         curve_num = pt["curveNumber"]
 
-        # print(hoverData)
-        # print(pt)
-
         if len(fig.data) != 1:
-            # TODO replace with query
-            # df_curve = df_grouped.get_group(curve_dict[curve_num]).reset_index(
-            #     drop=True
-            # )
             df_curve = curve_dict[curve_num].reset_index(drop=True)
-            # df_curve = df[df[color_col] == curve_dict[curve_num]]
             df_row = df_curve.iloc[num]
         else:
             df_row = df.iloc[num]
@@ -229,10 +219,8 @@ def add_molecules(
         hoverbox_elements = []
 
         if show_img:
-            # # The 2D image of the molecule is generated here
+            # The 2D image of the molecule is generated here
             for col in chosen_smiles:
-                # if col in chosen_smiles:
-                # print(df_row)
                 smiles = df_row[col]
                 buffered = BytesIO()
                 d2d = rdMolDraw2D.MolDraw2DSVG(svg_size, svg_size)
