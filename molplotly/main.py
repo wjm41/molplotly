@@ -197,7 +197,7 @@ def add_molecules(
     def display_hover(hoverData, value):
         if hoverData is None:
             return False, no_update, no_update
-        print(value)
+
         if value is None:
             value = smiles_col
         if isinstance(value, str):
