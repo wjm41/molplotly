@@ -9,16 +9,16 @@
 ![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/pca.gif)
 ![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/multiple_smiles.gif)
 
-➡️ &nbsp;A readable walkthrough of how to use the package together with some useful examples can be found in [this blog post](https://www.wmccorkindale.com/post/introducing-molplotly) while a runnable notebook can be found in `examples/example.ipynb` :)
+A readable walkthrough of how to use the package together with some useful examples can be found in [this blog post](https://www.wmccorkindale.com/post/introducing-molplotly) while a runnable notebook can be found in `examples/simple_usage_and_formatting.ipynb` :)
 
-## ⬇️ Installation
+## Installation
 
 ```sh
 pip install molplotly
 conda install rdkit
 ```
 
-## 📜 &nbsp;Usage
+## Usage
 
 ```python
 import pandas as pd
@@ -93,12 +93,12 @@ by default a JupyterDash `app` is returned which can be run inline in a jupyter 
 - The recommended `height` of the app is `50+(height of the plotly figure)`.
 - For the `port` of the app, make sure you don't pick the same `port` as another `molplotly` plot otherwise the tooltips will clash with each other. Also, apparently on windows port numbers below `8700` are used by other processes so for safety processes keep to numbers above that.
 
-## 💻 &nbsp; Can I run this in colab?
+## Can I run this in colab?
 
 JupyterDash is supposed to have support for Google Colab but at some point that seems to have broken.. Keep an eye on the raised issue [here](https://github.com/plotly/jupyter-dash/issues/10)!
 Update (1st March 2022): The plots seem to be running again but the hoverboxes are not showing so I don't think it has been fully fixed - I will keep an eye on it in the meantime.
 
-## 💾 &nbsp; Can I save these plots?
+## Can I save these plots?
 
 An issue/feature request for this has already been raised [here](https://github.com/wjm41/molplotly/issues/4).
 
@@ -106,7 +106,7 @@ An issue/feature request for this has already been raised [here](https://github.
 
 Until I find a way to get around that, the best alternative is to either host the plot on an app/server, exporting the plotly figure without molecules showing :( as detailed in this [page](https://plotly.com/python/interactive-html-export/). If you want to use it in a presentation I'd suggest keeping the figure open in a browser and changing windows to it during your talk!
 
-## 🛑 &nbsp;Warning about memory size
+## Warning about memory size
 
 Just adding a warning here that memory usage in a notebook can increase significanly when using plotly (not `molplotly`'s fault!). If you notice your jupyter notebook slowing down, plotly itself is a likely culprit... In that case I'd consider either using plotly with [static image rendering](https://plotly.com/python/renderers/#static-image-renderers), or ... use [seaborn](https://seaborn.pydata.org/index.html) :P
 
