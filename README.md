@@ -46,7 +46,7 @@ app = molplotly.add_molecules(fig=fig,
 app.run_server(mode='inline', port=8011, height=1000)
 ```
 
-#### Input parameters
+### Input parameters
 
 - `fig` : plotly.graph_objects.Figure object\
     a plotly figure object containing datapoints plotted from `df`.
@@ -88,26 +88,23 @@ app.run_server(mode='inline', port=8011, height=1000)
 
 #### Output parameters
 
-<!-- TODO update about port numbers -->
-
 by default a JupyterDash `app` is returned which can be run inline in a jupyter notebook or deployed on a server via `app.run_server()`
 
 - The recommended `height` of the app is `50+(height of the plotly figure)`.
-- For the `port` of the app, make sure you don't pick the same `port` as another `molplotly` plot otherwise the tooltips will clash with each other!
+- For the `port` of the app, make sure you don't pick the same `port` as another `molplotly` plot otherwise the tooltips will clash with each other. Also, apparently on windows port numbers below `8700` are used by other processes so for safety processes keep to numbers above that.
 
 ## 💻 &nbsp; Can I run this in colab?
 
-<!-- TODO Update with fix -->
-
-JupyterDash is supposed to have support for Google Colab but at some point that seems to have broken... Keep an eye on the raised issue [here](https://github.com/plotly/jupyter-dash/issues/10)!
+JupyterDash is supposed to have support for Google Colab but at some point that seems to have broken.. Keep an eye on the raised issue [here](https://github.com/plotly/jupyter-dash/issues/10)!
+Update (1st March 2022): The plots seem to be running again but the hoverboxes are not showing so I don't think it has been fully fixed - I will keep an eye on it in the meantime.
 
 ## 💾 &nbsp; Can I save these plots?
 
-<!-- TODO Update & link to issue -->
+An issue/feature request for this has already been raised [here](https://github.com/wjm41/molplotly/issues/4).
 
 `moltplotly` works using a Dash app which is non-trivial to export because server side javascript is needed in addition to HTML/CSS styling ([as detailed here](https://stackoverflow.com/questions/60097577/how-to-export-a-plotly-dashboard-app-into-a-html-standalone-file-to-share-with-t))
 
-Until I find a way to get around that, the best alternative is exporting the plotly figure without molecules showing :( as detailed in this [page](https://plotly.com/python/interactive-html-export/). If you want to use it in a presentation I'd suggest keeping the figure open in a browser and changing windows to it during your talk!
+Until I find a way to get around that, the best alternative is to either host the plot on an app/server, exporting the plotly figure without molecules showing :( as detailed in this [page](https://plotly.com/python/interactive-html-export/). If you want to use it in a presentation I'd suggest keeping the figure open in a browser and changing windows to it during your talk!
 
 ## 🛑 &nbsp;Warning about memory size
 
