@@ -9,7 +9,7 @@
 ![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/pca.gif)
 ![Beautiful :)](https://raw.githubusercontent.com/wjm41/molplotly/main/images/multiple_smiles.gif)
 
-➡️ &nbsp;A readable walkthrough of how to use the package together with some useful examples can be found in [this blog post](https://www.wmccorkindale.com/post/introducing-molplotly) while a runnable notebook can be found in `example.ipynb` :)
+➡️ &nbsp;A readable walkthrough of how to use the package together with some useful examples can be found in [this blog post](https://www.wmccorkindale.com/post/introducing-molplotly) while a runnable notebook can be found in `examples/example.ipynb` :)
 
 ## ⬇️ Installation
 
@@ -27,7 +27,8 @@ import plotly.express as px
 import molplotly
 
 # load a DataFrame with smiles
-df_esol = pd.read_csv('esol.csv')
+df_esol = pd.read_csv(
+    'https://raw.githubusercontent.com/deepchem/deepchem/master/datasets/delaney-processed.csv')
 df_esol['y_pred'] = df_esol['ESOL predicted log solubility in mols per litre']
 df_esol['y_true'] = df_esol['measured log solubility in mols per litre']
 
@@ -45,54 +46,65 @@ app = molplotly.add_molecules(fig=fig,
 app.run_server(mode='inline', port=8011, height=1000)
 ```
 
-#### Input parameters
+### Input parameters
 
 - `fig` : plotly.graph_objects.Figure object\
-    a plotly figure object containing datapoints plotted from df
+    a plotly figure object containing datapoints plotted from `df`.
 
 - `df` : pandas.DataFrame object\
-    a pandas dataframe that contains the data plotted in fig
+    a pandas dataframe that contains the data plotted in `fig`.
 - `smiles_col` : str, optional\
-    name of the column in df containing the smiles plotted in fig (default 'SMILES')
+    name of the column in df containing the smiles plotted in `fig` (default 'SMILES').
 - `show_img` : bool, optional\
-    whether or not to generate the molecule image in the dash app (default True)
+    whether or not to generate the molecule image in the dash app (default True).
+- `svg_size` : float, optional
+        the size in pixels of the molecule drawing (default 200).
+- `alpha` : float, optional\
+    the transparency of the hoverbox, 0 for full transparency 1 for full opaqueness (default 0.7).
+- `mol_alpha` : float, optional\
+    the transparency of the SVG molecule image, 0 for full transparency 1 for full opaqueness (default 0.7).
 - `title_col` : str, optional\
-    name of the column in df to be used as the title entry in the hover box (default None)
+    name of the column in df to be used as the title entry in the hover box (default None).
 - `show_coords` : bool, optional\
-    whether or not to show the coordinates of the data point in the hover box (default True)
+    whether or not to show the coordinates of the data point in the hover box (default True).
 - `caption_cols` : list, optional\
-    list of column names in df to be included in the hover box (default None)
+    list of column names in df to be included in the hover box (default None).
 - `caption_transform` : dict, optional\
-    Functions applied to specific items in all cells. The dict must follow a key: function structure where the key must correspond to one of the columns in subset or tooltip. (default {})
+    Functions applied to captions for formatting. The dict must follow a key: function structure where the key must correspond to one of the columns in subset or tooltip (default {}).
 - `color_col` : str, optional\
-    name of the column in df that is used to color the datapoints in df - necessary when there is discrete conditional coloring (default None)
+    name of the column in df that is used to color the datapoints in df - necessary when there is discrete conditional coloring (default None).
+- `marker_col` : str, optional\
+    name of the column in df that is used to determine the marker shape of the datapoints in df (default None).
 - `wrap` : bool, optional\
-    whether or not to wrap the title text to multiple lines if the length of the text is too long (default True)
+    whether or not to wrap the title text to multiple lines if the length of the text is too long (default True).
 - `wraplen` : int, optional\
-    the threshold length of the title text before wrapping begins - adjust when changing the width of the hover box (default 20)
+    the threshold length of the title text before wrapping begins - adjust when changing the width of the hover box (default 20).
 - `width` : int, optional\
-    the width in pixels of the hover box (default 150)
+    the width in pixels of the hover box (default 150).
 - `fontfamily` : str, optional\
-    the font family used in the hover box (default 'Arial')
+    the font family used in the hover box (default 'Arial').
 - `fontsize` : int, optional\
-    the font size used in the hover box - the font of the title line is fontsize+2 (default 12)
+    the font size used in the hover box - the font of the title line is fontsize+2 (default 12).
 
 #### Output parameters
 
 by default a JupyterDash `app` is returned which can be run inline in a jupyter notebook or deployed on a server via `app.run_server()`
 
 - The recommended `height` of the app is `50+(height of the plotly figure)`.
-- For the `port` of the app, make sure you don't pick the same `port` as another `molplotly` plot otherwise the tooltips will clash with each other!
+- For the `port` of the app, make sure you don't pick the same `port` as another `molplotly` plot otherwise the tooltips will clash with each other. Also, apparently on windows port numbers below `8700` are used by other processes so for safety processes keep to numbers above that.
 
 ## 💻 &nbsp; Can I run this in colab?
 
-JupyterDash is supposed to have support for Google Colab but at some point that seems to have broken... Keep an eye on the raised issue [here](https://github.com/plotly/jupyter-dash/issues/10)!
+JupyterDash is supposed to have support for Google Colab but at some point that seems to have broken.. Keep an eye on the raised issue [here](https://github.com/plotly/jupyter-dash/issues/10)!
+Update (1st March 2022): The plots seem to be running again but the hoverboxes are not showing so I don't think it has been fully fixed - I will keep an eye on it in the meantime.
 
 ## 💾 &nbsp; Can I save these plots?
 
+An issue/feature request for this has already been raised [here](https://github.com/wjm41/molplotly/issues/4).
+
 `moltplotly` works using a Dash app which is non-trivial to export because server side javascript is needed in addition to HTML/CSS styling ([as detailed here](https://stackoverflow.com/questions/60097577/how-to-export-a-plotly-dashboard-app-into-a-html-standalone-file-to-share-with-t))
 
-Until I find a way to get around that, the best alternative is exporting the plotly figure without molecules showing :( as detailed in this [page](https://plotly.com/python/interactive-html-export/). If you want to use it in a presentation I'd suggest keeping the figure open in a browser and changing windows to it during your talk!
+Until I find a way to get around that, the best alternative is to either host the plot on an app/server, exporting the plotly figure without molecules showing :( as detailed in this [page](https://plotly.com/python/interactive-html-export/). If you want to use it in a presentation I'd suggest keeping the figure open in a browser and changing windows to it during your talk!
 
 ## 🛑 &nbsp;Warning about memory size
 
