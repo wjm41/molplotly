@@ -43,7 +43,7 @@ app = molplotly.add_molecules(fig=fig,
                             )
 
 # run Dash app inline in notebook (or in an external server)
-app.run_server(mode='inline', port=8011, height=1000)
+app.run_server(mode='inline', port=8700, height=1000)
 ```
 
 ### Input parameters
@@ -72,9 +72,9 @@ app.run_server(mode='inline', port=8011, height=1000)
 - `caption_transform` : dict, optional\
     Functions applied to captions for formatting. The dict must follow a key: function structure where the key must correspond to one of the columns in subset or tooltip (default {}).
 - `color_col` : str, optional\
-    name of the column in df that is used to color the datapoints in df - necessary when there is discrete conditional coloring (default None).
+    name of the column in df that is used to color the datapoints in `df` - necessary when there is discrete conditional coloring (default None).
 - `marker_col` : str, optional\
-    name of the column in df that is used to determine the marker shape of the datapoints in df (default None).
+    name of the column in df that is used to determine the marker shape of the datapoints in `df` (default None).
 - `wrap` : bool, optional\
     whether or not to wrap the title text to multiple lines if the length of the text is too long (default True).
 - `wraplen` : int, optional\
@@ -84,7 +84,7 @@ app.run_server(mode='inline', port=8011, height=1000)
 - `fontfamily` : str, optional\
     the font family used in the hover box (default 'Arial').
 - `fontsize` : int, optional\
-    the font size used in the hover box - the font of the title line is fontsize+2 (default 12).
+    the font size used in the hover box - the font of the title line is `fontsize`+2 (default 12).
 
 #### Output parameters
 
