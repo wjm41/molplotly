@@ -146,9 +146,10 @@ def add_molecules(
         df_data[color_col] = df_data[color_col].astype(str)
     if marker_col is not None:
         df_data[marker_col] = df_data[marker_col].astype(str)
-    colors = {0: "black"}
+    
 
     if len(fig.data) != 1:
+        colors = {index: x.marker["color"] for index, x in enumerate(fig.data)}
         if color_col is None and marker_col is None:
             raise ValueError(
                 "More than one plotly curve in figure - color_col and/or marker_col needs to be specified."
@@ -161,7 +162,9 @@ def add_molecules(
             df_grouped, curve_dict = find_grouping(
                 fig, df_data, [color_col, marker_col]
             )
-
+    else:
+        colors = {0: "black"}
+        
     app = JupyterDash(__name__)
     if isinstance(smiles_col, str):
         smiles_col = [smiles_col]
