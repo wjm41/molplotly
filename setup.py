@@ -15,6 +15,7 @@ setup(
         "plotly",
         "pandas",
     ],
+    extras_require={"test": ["pytest"]},
     classifiers=[
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
