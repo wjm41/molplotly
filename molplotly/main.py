@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import base64
 import textwrap
 from io import BytesIO
@@ -43,8 +45,8 @@ def test_groups(fig: Figure, df_grouped: DataFrameGroupBy):
 
 
 def find_grouping(
-    fig: Figure, df_data: pd.DataFrame, cols: List[str]
-) -> Tuple[DataFrameGroupBy, dict]:
+    fig: Figure, df_data: pd.DataFrame, cols: list[str]
+) -> tuple[DataFrameGroupBy, dict]:
 
     if len(cols) == 1:
         df_grouped = df_data.groupby(cols)
@@ -84,15 +86,15 @@ def find_grouping(
 def add_molecules(
     fig: Figure,
     df: pd.DataFrame,
-    smiles_col: Union[str, List[str]] = "SMILES",
+    smiles_col: str | list[str] = "SMILES",
     show_img: bool = True,
     svg_size: int = 200,
     alpha: float = 0.75,
     mol_alpha: float = 0.7,
     title_col: str = None,
     show_coords: bool = True,
-    caption_cols: List[str] = None,
-    caption_transform: Dict[str, Callable] = {},
+    caption_cols: list[str] = None,
+    caption_transform: dict[str, Callable] = {},
     color_col: str = None,
     marker_col: str = None,
     wrap: bool = True,
@@ -239,7 +241,7 @@ def add_molecules(
                 img_str = d2d.GetDrawingText()
                 buffered.write(str.encode(img_str))
                 img_str = base64.b64encode(buffered.getvalue())
-                img_str = "data:image/svg+xml;base64,{}".format(repr(img_str)[2:-1])
+                img_str = f"data:image/svg+xml;base64,{repr(img_str)[2:-1]}"
                 # img_str = df_data.query(f"{col} == @smiles")[f"{col}_img"].values[0]
 
                 if len(smiles_col) > 1:
