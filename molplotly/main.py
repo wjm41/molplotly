@@ -3,7 +3,7 @@ from __future__ import annotations
 import base64
 import textwrap
 from io import BytesIO
-from typing import Callable, Dict, List, Tuple, Union
+from typing import Callable
 
 import pandas as pd
 from dash import Input, Output, dcc, html, no_update
