@@ -1,24 +1,22 @@
-from io import BytesIO
-import os
 import base64
 import textwrap
-from PIL import ImageFont
+from io import BytesIO
+from typing import Callable, Dict, List, Tuple, Union
 
-import numpy as np
+import pandas as pd
+from dash import Input, Output, dcc, html, no_update
+from jupyter_dash import JupyterDash
+from pandas.core.groupby import DataFrameGroupBy
+from plotly.graph_objects import Figure
 from rdkit import Chem
 from rdkit.Chem.Draw import rdMolDraw2D
 
-from jupyter_dash import JupyterDash
 
-import plotly.express as px
-from dash import dcc, html, Input, Output, no_update
-
-
-def str2bool(v):
+def str2bool(v: str) -> bool:
     return v.lower() in ("yes", "true", "t", "1")
 
 
-def test_groups(fig, df_grouped):
+def test_groups(fig: Figure, df_grouped: DataFrameGroupBy):
     """Test if plotly figure curve names match up with pandas dataframe groups
 
     Args:
@@ -44,13 +42,15 @@ def test_groups(fig, df_grouped):
     return True
 
 
-def find_grouping(fig, df_data, cols):
+def find_grouping(
+    fig: Figure, df_data: pd.DataFrame, cols: List[str]
+) -> Tuple[DataFrameGroupBy, dict]:
 
     if len(cols) == 1:
         df_grouped = df_data.groupby(cols)
         if not test_groups(fig, df_grouped):
             raise ValueError(
-                "marker_col is mispecified because the dataframe grouping names don't match the names in the plotly figure."
+                "marker_col is misspecified because the dataframe grouping names don't match the names in the plotly figure."
             )
 
     elif len(cols) == 2:  # color_col and marker_col
@@ -65,7 +65,7 @@ def find_grouping(fig, df_data, cols):
             df_grouped = df_grouped_y
         else:
             raise ValueError(
-                "color_col and marker_col are mispecified because their dataframe grouping names don't match the names in the plotly figure."
+                "color_col and marker_col are misspecified because their dataframe grouping names don't match the names in the plotly figure."
             )
     else:
         raise ValueError("Too many columns specified for grouping.")
@@ -82,25 +82,25 @@ def find_grouping(fig, df_data, cols):
 
 
 def add_molecules(
-    fig,
-    df,
-    smiles_col="SMILES",
-    show_img=True,
-    svg_size=200,
-    alpha=0.75,
-    mol_alpha=0.7,
-    title_col=None,
-    show_coords=True,
-    caption_cols=None,
-    caption_transform={},
-    color_col=None,
-    marker_col=None,
-    wrap=True,
-    wraplen=20,
-    width=150,
-    fontfamily="Arial",
-    fontsize=12,
-):
+    fig: Figure,
+    df: pd.DataFrame,
+    smiles_col: Union[str, List[str]] = "SMILES",
+    show_img: bool = True,
+    svg_size: int = 200,
+    alpha: float = 0.75,
+    mol_alpha: float = 0.7,
+    title_col: str = None,
+    show_coords: bool = True,
+    caption_cols: List[str] = None,
+    caption_transform: Dict[str, Callable] = {},
+    color_col: str = None,
+    marker_col: str = None,
+    wrap: bool = True,
+    wraplen: int = 20,
+    width: int = 150,
+    fontfamily: str = "Arial",
+    fontsize: int = 12,
+) -> JupyterDash:
     """
     A function that takes a plotly figure and a dataframe with molecular SMILES
     and returns a dash app that dynamically generates an image of molecules in the hover box
@@ -113,7 +113,7 @@ def add_molecules(
         a plotly figure object containing datapoints plotted from df.
     df : pandas.DataFrame object
         a pandas dataframe that contains the data plotted in fig.
-    smiles_col : str|list[str], optional
+    smiles_col : str | list[str], optional
         name of the column in df containing the smiles plotted in fig (default 'SMILES').
         If provided as a list, will add a slider to choose which column is used for rendering the structures.
     show_img : bool, optional
@@ -128,9 +128,9 @@ def add_molecules(
         name of the column in df to be used as the title entry in the hover box (default None).
     show_coords : bool, optional
         whether or not to show the coordinates of the data point in the hover box (default True).
-    caption_cols : list, optional
+    caption_cols : list[str], optional
         list of column names in df to be included in the hover box (default None).
-    caption_transform : dict, optional
+    caption_transform : dict[str, callable], optional
         Functions applied to specific items in all cells. The dict must follow a key: function structure where
         the key must correspond to one of the columns in subset or tooltip (default {}).
     color_col : str, optional
@@ -162,13 +162,11 @@ def add_molecules(
                 "More than one plotly curve in figure - color_col and/or marker_col needs to be specified."
             )
         if color_col is None:
-            df_grouped, curve_dict = find_grouping(fig, df_data, [marker_col])
+            _, curve_dict = find_grouping(fig, df_data, [marker_col])
         elif marker_col is None:
-            df_grouped, curve_dict = find_grouping(fig, df_data, [color_col])
+            _, curve_dict = find_grouping(fig, df_data, [color_col])
         else:
-            df_grouped, curve_dict = find_grouping(
-                fig, df_data, [color_col, marker_col]
-            )
+            _, curve_dict = find_grouping(fig, df_data, [color_col, marker_col])
     else:
         colors = {0: "black"}
 
