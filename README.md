@@ -50,43 +50,26 @@ app.run_server(mode='inline', port=8700, height=1000)
 
 ### Input parameters
 
-- `fig` : plotly.graph_objects.Figure object\
-    a plotly figure object containing datapoints plotted from `df`.
-
-- `df` : pandas.DataFrame object\
-    a pandas dataframe that contains the data plotted in `fig`.
-- `smiles_col` : str, optional\
-    name of the column in df containing the smiles plotted in `fig` (default 'SMILES').
-- `show_img` : bool, optional\
-    whether or not to generate the molecule image in the dash app (default True).
-- `svg_size` : float, optional
-        the size in pixels of the molecule drawing (default 200).
-- `alpha` : float, optional\
-    the transparency of the hoverbox, 0 for full transparency 1 for full opaqueness (default 0.7).
-- `mol_alpha` : float, optional\
-    the transparency of the SVG molecule image, 0 for full transparency 1 for full opaqueness (default 0.7).
-- `title_col` : str, optional\
-    name of the column in df to be used as the title entry in the hover box (default None).
-- `show_coords` : bool, optional\
-    whether or not to show the coordinates of the data point in the hover box (default True).
-- `caption_cols` : list, optional\
-    list of column names in df to be included in the hover box (default None).
-- `caption_transform` : dict, optional\
-    Functions applied to captions for formatting. The dict must follow a key: function structure where the key must correspond to one of the columns in subset or tooltip (default {}).
-- `color_col` : str, optional\
-    name of the column in df that is used to color the datapoints in `df` - necessary when there is discrete conditional coloring (default None).
-- `marker_col` : str, optional\
-    name of the column in df that is used to determine the marker shape of the datapoints in `df` (default None).
-- `wrap` : bool, optional\
-    whether or not to wrap the title text to multiple lines if the length of the text is too long (default True).
-- `wraplen` : int, optional\
-    the threshold length of the title text before wrapping begins - adjust when changing the width of the hover box (default 20).
-- `width` : int, optional\
-    the width in pixels of the hover box (default 150).
-- `fontfamily` : str, optional\
-    the font family used in the hover box (default 'Arial').
-- `fontsize` : int, optional\
-    the font size used in the hover box - the font of the title line is `fontsize`+2 (default 12).
+| name                | type        | default    | description                                                                                                                                                           |
+| :------------------ | :---------- | :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fig`               | `figure`    | required   | a plotly figure object containing datapoints plotted from `df`.                                                                                                       |
+| `df`                | `DataFrame` | required   | a pandas dataframe that contains the data plotted in `fig`.                                                                                                           |
+| `smiles_col`        | `str`       | `'SMILES'` | name of the column in df containing the smiles plotted in `fig`                                                                                                       |
+| `show_img`          | `bool`      | `True`     | whether or not to generate the molecule image in the dash app                                                                                                         |
+| `svg_size`          | `float`     | `200`      | the size in pixels of the molecule drawing                                                                                                                            |
+| `alpha`             | `float`     | `0.7`      | the transparency of the hoverbox, 0 for full transparency 1 for full opaqueness                                                                                       |
+| `mol_alpha`         | `float`     | `0.7`      | the transparency of the SVG molecule image, 0 for full transparency 1 for full opaqueness                                                                             |
+| `title_col`         | `str`       | `None`     | name of the column in df to be used as the title entry in the hover box                                                                                               |
+| `show_coords`       | `bool`      | `True`     | whether or not to show the coordinates of the data point in the hover box                                                                                             |
+| `caption_cols`      | `list`      | `None`     | list of column names in df to be included in the hover box                                                                                                            |
+| `caption_transform` | `dict`      | `{}`       | Functions applied to captions for formatting. The dict must follow a key: function structure where the key must correspond to one of the columns in subset or tooltip |
+| `color_col`         | `str`       | `None`     | name of the column in df that is used to color the datapoints in `df` - necessary when there is discrete conditional coloring                                         |
+| `marker_col`        | `str`       | `None`     | name of the column in df that is used to determine the marker shape of the datapoints in `df`                                                                         |
+| `wrap`              | `bool`      | `True`     | whether or not to wrap the title text to multiple lines if the length of the text is too long                                                                         |
+| `wraplen`           | `int`       | `20`       | the threshold length of the title text before wrapping begins - adjust when changing the width of the hover box                                                       |
+| `width`             | `int`       | `150`      | the width in pixels of the hover box                                                                                                                                  |
+| `fontfamily`        | `str`       | `'Arial'`  | the font family used in the hover box                                                                                                                                 |
+| `fontsize`          | `int`       | `12`       | the font size used in the hover box - the font of the title line is `fontsize`+2                                                                                      |
 
 #### Output parameters
 
