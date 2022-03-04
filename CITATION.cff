@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "McCorkindale"
+  given-names: "William"
+  orcid: "https://orcid.org/0000-0001-6052-8833"
+- family-names: "Elijošius"
+  given-names: "Rokas"
+  orcid: "https://orcid.org/0000-0001-6397-0002"
+title: "molplotly"
+version: 1.1.1
+date-released: 2022-03-01
+url: "https://github.com/wjm41/molplotly"
