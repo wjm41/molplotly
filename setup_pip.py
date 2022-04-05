@@ -18,14 +18,14 @@ setup(
     author="William McCorkindale",
     author_email="wjm41@cam.ac.uk",
     url="https://github.com/wjm41/molplotly",
-    download_url="https://github.com/wjm41/molplotly/archive/refs/tags/v1.1.1.tar.gz",
+    download_url="https://github.com/wjm41/molplotly/archive/refs/tags/v1.1.2.tar.gz",
     install_requires=[
+        "dash==2.0.0",
         "jupyter-dash",
         "plotly",
         "pandas",
         "ipykernel",
         "scikit-learn",
-        "dash==2.0.0",
     ],
     keywords=["science", "chemistry", "cheminformatics"],
     classifiers=[
