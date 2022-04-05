@@ -27,8 +27,8 @@ jobs:
 
       - name: Install molplotly + dependencies
         run: |
-          conda install rdkit
           pip install .[test]
+          pip install rdkit-pypi
 
       - name: Run tests
         run: pytest --cov molplotly
