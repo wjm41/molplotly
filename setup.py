@@ -12,6 +12,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         "dash==2.0.0",
+        "werkzeug==2.0.0",
+        "jupyter-dash",
         "plotly",
         "pandas",
     ],
