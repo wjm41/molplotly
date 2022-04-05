@@ -1,4 +1,6 @@
 import molplotly
+import multiprocessing
+import time
 import pandas as pd
 import plotly.express as px
 from jupyter_dash import JupyterDash
@@ -33,5 +35,3 @@ def test_add_molecules():
     )
 
     assert isinstance(app_scatter, JupyterDash)
-
-    app_scatter.run_server()
