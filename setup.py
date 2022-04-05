@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="molplotly",
-    version="1.0.1",
+    version="1.1.2",
     description="plotly add-on to render molecule images on mouseover",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -11,7 +11,7 @@ setup(
     license="Apache License 2.0",
     packages=find_packages(),
     install_requires=[
-        "dash",
+        "dash==2.0.0",
         "plotly",
         "pandas",
     ],
