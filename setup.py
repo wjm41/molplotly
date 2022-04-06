@@ -13,10 +13,12 @@ setup(
     install_requires=[
         "dash==2.0.0",
         "werkzeug==2.0.0",
-        "pytest-cov~=3.0.0",
+        "pytest-cov ~= 3.0.0",
         "jupyter-dash",
-        "plotly",
-        "pandas",
+        "plotly~=5.6.0",
+        "pandas~=1.4.1",
+        "ipykernel~=6.9.1",
+        "scikit-learn~=1.0.0",
     ],
     extras_require={"test": ["pytest"]},
     classifiers=[
