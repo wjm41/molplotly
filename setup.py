@@ -19,7 +19,7 @@ setup(
         "ipykernel",
         "nbformat",
     ],
-    extras_require={"test": ["pytest"]},
+    extras_require={"test": ["pytest", "pytest-cov"]},
     keywords=["science", "chemistry", "cheminformatics"],
     classifiers=[
         "Development Status :: 4 - Beta",
