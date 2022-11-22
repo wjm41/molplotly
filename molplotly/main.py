@@ -11,6 +11,7 @@ from jupyter_dash import JupyterDash
 from pandas.core.groupby import DataFrameGroupBy
 from plotly.graph_objects import Figure
 from rdkit import Chem
+from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.Draw import rdMolDraw2D
 
 
@@ -87,6 +88,7 @@ def add_molecules(
     fig: Figure,
     df: pd.DataFrame,
     smiles_col: str | list[str] = "SMILES",
+    mol_col: Mol | list[Mol] = None,
     show_img: bool = True,
     svg_size: int = 200,
     alpha: float = 0.75,
@@ -173,10 +175,23 @@ def add_molecules(
         colors = {0: "black"}
 
     app = JupyterDash(__name__)
+    if smiles_col is None and mol_col is None:
+        raise ValueError("Either smiles_col or mol_col has to be specified!")
+
     if isinstance(smiles_col, str):
         smiles_col = [smiles_col]
+    if isinstance(mol_col, str):
+        mol_col = [mol_col]
 
-    if len(smiles_col) > 1:
+    if mol_col is not None and len(mol_col) > 1:
+        menu = dcc.Dropdown(
+            options=[{"label": x, "value": x} for x in mol_col],
+            value=mol_col[0],
+            multi=True,
+            id="smiles-menu",
+            placeholder="Select a mol column to display",
+        )
+    elif smiles_col is not None and len(smiles_col) > 1:
         menu = dcc.Dropdown(
             options=[{"label": x, "value": x} for x in smiles_col],
             value=smiles_col[0],
@@ -209,7 +224,10 @@ def add_molecules(
             return False, no_update, no_update
 
         if value is None:
-            value = smiles_col
+            if mol_col is not None:
+                value = mol_col
+            elif smiles_col is not None:
+                value = smiles_col
         if isinstance(value, str):
             chosen_smiles = [value]
         else:
@@ -229,21 +247,33 @@ def add_molecules(
         hoverbox_elements = []
 
         if show_img:
-            # The 2D image of the molecule is generated here
             for col in chosen_smiles:
                 smiles = df_row[col]
                 buffered = BytesIO()
-                d2d = rdMolDraw2D.MolDraw2DSVG(svg_size, svg_size)
-                opts = d2d.drawOptions()
-                opts.clearBackground = False
-                d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
-                d2d.FinishDrawing()
-                img_str = d2d.GetDrawingText()
-                buffered.write(str.encode(img_str))
-                img_str = base64.b64encode(buffered.getvalue())
-                img_str = f"data:image/svg+xml;base64,{repr(img_str)[2:-1]}"
-                # img_str = df_data.query(f"{col} == @smiles")[f"{col}_img"].values[0]
+                if isinstance(smiles, str):
+                    # Generate 2D SVG if smiles column is a string
 
+                    d2d = rdMolDraw2D.MolDraw2DSVG(svg_size, svg_size)
+                    opts = d2d.drawOptions()
+                    opts.clearBackground = False
+                    d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
+                    d2d.FinishDrawing()
+                    img_str = d2d.GetDrawingText()
+                    buffered.write(str.encode(img_str))
+                    img_str = base64.b64encode(buffered.getvalue())
+                    img_str = f"data:image/svg+xml;base64,{repr(img_str)[2:-1]}"
+
+                elif isinstance(smiles, Mol):
+                    # if smiles column is a Mol object, use the 3D coordinates of the mol object
+                    img = Chem.Draw.MolToImage(smiles)
+                    img.save(buffered, format="PNG")
+                    img_str = base64.b64encode(buffered.getvalue())
+                    img_str = "data:image/png;base64,{}".format(repr(img_str)[2:-1])
+
+                else:
+                    raise TypeError(
+                        "smiles_col or mol_col not specified with the correct type."
+                    )
                 if len(smiles_col) > 1:
                     hoverbox_elements.append(
                         html.H2(
