@@ -4,6 +4,8 @@ import base64
 import textwrap
 from io import BytesIO
 from typing import Callable
+import itertools
+import re
 
 import pandas as pd
 from dash import Input, Output, dcc, html, no_update
@@ -48,37 +50,51 @@ def find_grouping(
     fig: Figure, df_data: pd.DataFrame, cols: list[str]
 ) -> tuple[DataFrameGroupBy, dict]:
 
-    if len(cols) == 1:
-        df_grouped = df_data.groupby(cols)
-        if not test_groups(fig, df_grouped):
-            raise ValueError(
-                "marker_col is misspecified because the dataframe grouping names don't match the names in the plotly figure."
-            )
+    if fig.data[0].hovertemplate is not None:
 
-    elif len(cols) == 2:  # color_col and marker_col
+        col_names = re.findall(r"(.*?)=(?!%).*?<.*?>", fig.data[0].hovertemplate)
+        curve_names = []
+        for data in fig.data:
+            curve_name = re.findall(r".*?=(?!%)(.*?)<.*?>", data.hovertemplate)
+            curve_names.append(curve_name)
 
-        df_grouped_x = df_data.groupby(cols)
-        df_grouped_y = df_data.groupby([cols[1], cols[0]])
+        df_grouped = df_data.groupby(col_names)
 
-        if test_groups(fig, df_grouped_x):
-            df_grouped = df_grouped_x
-
-        elif test_groups(fig, df_grouped_y):
-            df_grouped = df_grouped_y
-        else:
-            raise ValueError(
-                "color_col and marker_col are misspecified because their dataframe grouping names don't match the names in the plotly figure."
-            )
     else:
-        raise ValueError("Too many columns specified for grouping.")
+        for combo in itertools.permutations(cols):
+            df_grouped_tmp = df_data.groupby(list(combo))
+            if test_groups(fig, df_grouped_tmp):
+                df_grouped = df_grouped_tmp
+                break
+    # if len(cols) == 1:
+    #     df_grouped = df_data.groupby(cols)
+    #     if not test_groups(fig, df_grouped):
+    #         raise ValueError(
+    #             "marker_col is misspecified because the dataframe grouping names don't match the names in the plotly figure."
+    #         )
 
+    # elif len(cols) == 2:  # color_col and marker_col
+
+    #     df_grouped_x = df_data.groupby(cols)
+    #     df_grouped_y = df_data.groupby([cols[1], cols[0]])
+
+    #     if test_groups(fig, df_grouped_x):
+    #         df_grouped = df_grouped_x
+
+    #     elif test_groups(fig, df_grouped_y):
+    #         df_grouped = df_grouped_y
+    #     else:
+    #         raise ValueError(
+    #             "color_col and marker_col are misspecified because their dataframe grouping names don't match the names in the plotly figure."
+    #         )
+    # else:
+    #     raise ValueError("Too many columns specified for grouping.")
     str_groups = {}
     for name, group in df_grouped:
         if isinstance(name, tuple):
             str_groups[", ".join(str(x) for x in name)] = group
         else:
             str_groups[name] = group
-
     curve_dict = {index: str_groups[x["name"]] for index, x in enumerate(fig.data)}
     return df_grouped, curve_dict
 
@@ -97,6 +113,7 @@ def add_molecules(
     caption_transform: dict[str, Callable] = {},
     color_col: str = None,
     marker_col: str = None,
+    facet_col: str = None,
     wrap: bool = True,
     wraplen: int = 20,
     width: int = 150,
@@ -156,7 +173,6 @@ def add_molecules(
         df_data[color_col] = df_data[color_col].astype(str)
     if marker_col is not None:
         df_data[marker_col] = df_data[marker_col].astype(str)
-
     if len(fig.data) != 1:
         colors = {index: x.marker["color"] for index, x in enumerate(fig.data)}
         if color_col is None and marker_col is None:
