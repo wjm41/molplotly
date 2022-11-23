@@ -12,6 +12,8 @@ from dash import Input, Output, dcc, html, no_update
 from jupyter_dash import JupyterDash
 from pandas.core.groupby import DataFrameGroupBy
 from plotly.graph_objects import Figure
+import plotly.graph_objects as go
+
 from rdkit import Chem
 from rdkit.Chem.Draw import rdMolDraw2D
 
@@ -51,21 +53,43 @@ def find_grouping(
 ) -> tuple[DataFrameGroupBy, dict]:
 
     if fig.data[0].hovertemplate is not None:
-
         col_names = re.findall(r"(.*?)=(?!%).*?<.*?>", fig.data[0].hovertemplate)
-        curve_names = []
-        for data in fig.data:
-            curve_name = re.findall(r".*?=(?!%)(.*?)<.*?>", data.hovertemplate)
-            curve_names.append(curve_name)
-
         df_grouped = df_data.groupby(col_names)
+
+        str_groups = {}
+        for name, group in df_grouped:
+            if isinstance(name, tuple):
+                str_groups[", ".join(str(x) for x in name)] = group
+            else:
+                str_groups[name] = group
+
+        curve_dict = {}
+        for index, data in enumerate(fig.data):
+            curve_name = re.findall(r".*?=(?!%)(.*?)<.*?>", data.hovertemplate)
+            curve_name = ", ".join(str(x) for x in curve_name)
+            curve_dict[index] = str_groups[curve_name]
+
+        return df_grouped, curve_dict
 
     else:
         for combo in itertools.permutations(cols):
             df_grouped_tmp = df_data.groupby(list(combo))
             if test_groups(fig, df_grouped_tmp):
                 df_grouped = df_grouped_tmp
-                break
+                str_groups = {}
+                for name, group in df_grouped:
+                    if isinstance(name, tuple):
+                        str_groups[", ".join(str(x) for x in name)] = group
+                    else:
+                        str_groups[name] = group
+                curve_dict = {
+                    index: str_groups[x["name"]] for index, x in enumerate(fig.data)
+                }
+                return df_grouped, curve_dict
+
+            else:
+                continue
+
     # if len(cols) == 1:
     #     df_grouped = df_data.groupby(cols)
     #     if not test_groups(fig, df_grouped):
@@ -89,14 +113,6 @@ def find_grouping(
     #         )
     # else:
     #     raise ValueError("Too many columns specified for grouping.")
-    str_groups = {}
-    for name, group in df_grouped:
-        if isinstance(name, tuple):
-            str_groups[", ".join(str(x) for x in name)] = group
-        else:
-            str_groups[name] = group
-    curve_dict = {index: str_groups[x["name"]] for index, x in enumerate(fig.data)}
-    return df_grouped, curve_dict
 
 
 def add_molecules(
@@ -167,24 +183,31 @@ def add_molecules(
     fontsize : int, optional
         the font size used in the hover box - the font of the title line is fontsize+2 (default 12).
     """
-    fig.update_traces(hoverinfo="none", hovertemplate=None)
     df_data = df.copy()
     if color_col is not None:
         df_data[color_col] = df_data[color_col].astype(str)
     if marker_col is not None:
         df_data[marker_col] = df_data[marker_col].astype(str)
+    if facet_col is not None:
+        df_data[facet_col] = df_data[facet_col].astype(str)
+
     if len(fig.data) != 1:
         colors = {index: x.marker["color"] for index, x in enumerate(fig.data)}
-        if color_col is None and marker_col is None:
-            raise ValueError(
-                "More than one plotly curve in figure - color_col and/or marker_col needs to be specified."
-            )
-        if color_col is None:
-            _, curve_dict = find_grouping(fig, df_data, [marker_col])
-        elif marker_col is None:
-            _, curve_dict = find_grouping(fig, df_data, [color_col])
-        else:
-            _, curve_dict = find_grouping(fig, df_data, [color_col, marker_col])
+
+        cols = []
+
+        if color_col is not None:
+            cols.append(color_col)
+        if marker_col is not None:
+            cols.append(marker_col)
+        if facet_col is not None:
+            cols.append(facet_col)
+        # TODO - better error message
+        # if color_col is None and marker_col is None:
+        #     raise ValueError(
+        #         "More than one plotly curve in figure - color_col and/or marker_col needs to be specified."
+        #     )
+        _, curve_dict = find_grouping(fig, df_data, cols)
     else:
         colors = {0: "black"}
 
@@ -202,10 +225,14 @@ def add_molecules(
         )
     else:
         menu = dcc.Store(id="smiles-menu", data=0)
+
+    fig_copy = go.Figure(fig)
+    fig_copy.update_traces(hoverinfo="none", hovertemplate=None)
+
     app.layout = html.Div(
         [
             menu,
-            dcc.Graph(id="graph-basic-2", figure=fig, clear_on_unhover=True),
+            dcc.Graph(id="graph-basic-2", figure=fig_copy, clear_on_unhover=True),
             dcc.Tooltip(
                 id="graph-tooltip", background_color=f"rgba(255,255,255,{alpha})"
             ),
