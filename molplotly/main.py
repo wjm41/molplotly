@@ -55,9 +55,10 @@ def find_grouping(
 
     if fig.data[0].hovertemplate is not None:
         col_names = re.findall(r"(.*?)=(?!%).*?<.*?>", fig.data[0].hovertemplate)
+        col_names = [re.sub(r"(.*)>", "", col_name) for col_name in col_names]
         if set(col_names) != set(cols):
             raise ValueError(
-                "marker_col/color_col/facet_col is misspecified because the dataframe grouping names don't match the names in the plotly figure.",
+                f"marker_col/color_col/facet_col is misspecified because the specified dataframe grouping names {cols} don't match the names in the plotly figure {col_names}.",
             )
 
         df_grouped = df_data.groupby(col_names)
