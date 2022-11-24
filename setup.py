@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="molplotly",
-    version="1.1.4",
+    version="1.1.5",
     description="plotly add-on to render molecule images on mouseover",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
