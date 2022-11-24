@@ -18,7 +18,7 @@ setup(
     author="William McCorkindale",
     author_email="wjm41@cam.ac.uk",
     url="https://github.com/wjm41/molplotly",
-    download_url="https://github.com/wjm41/molplotly/archive/refs/tags/v1.1.4.tar.gz",
+    download_url="https://github.com/wjm41/molplotly/archive/refs/tags/v1.1.5.tar.gz",
     install_requires=[
         "dash>=2.0.0",
         "werkzeug>=2.0.0",
