@@ -120,6 +120,10 @@ def add_molecules(
     smiles_col : str | list[str], optional
         name of the column in df containing the smiles plotted in fig (default 'SMILES').
         If provided as a list, will add a slider to choose which column is used for rendering the structures.
+    mol_col : Mol | list[Mol], optional
+        name of the column in df containing RDKit Mol objects of the molecules plotted in fig (default None).
+        If not None, the structures will be drawn using the coordinates of the Mol objects.
+        If provided as a list, will add a slider to choose which column is used for rendering the structures.
     show_img : bool, optional
         whether or not to generate the molecule image in the dash app (default True).
     svg_size : float, optional
@@ -296,7 +300,10 @@ def add_molecules(
                 )
 
         if title_col is not None:
-            title = df_row[title_col]
+            title = df_row[title_col].astype(str)
+            if title_col in caption_transform:
+                title = caption_transform[title_col](title)
+
             if len(title) > wraplen:
                 if wrap:
                     title = textwrap.fill(title, width=wraplen)
