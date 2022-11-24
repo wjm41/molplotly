@@ -4,12 +4,16 @@ import base64
 import textwrap
 from io import BytesIO
 from typing import Callable
+import itertools
+import re
 
 import pandas as pd
 from dash import Input, Output, dcc, html, no_update
 from jupyter_dash import JupyterDash
 from pandas.core.groupby import DataFrameGroupBy
 from plotly.graph_objects import Figure
+import plotly.graph_objects as go
+
 from rdkit import Chem
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.Draw import rdMolDraw2D
@@ -49,39 +53,56 @@ def find_grouping(
     fig: Figure, df_data: pd.DataFrame, cols: list[str]
 ) -> tuple[DataFrameGroupBy, dict]:
 
-    if len(cols) == 1:
-        df_grouped = df_data.groupby(cols)
-        if not test_groups(fig, df_grouped):
+    if fig.data[0].hovertemplate is not None:
+        col_names = re.findall(r"(.*?)=(?!%).*?<.*?>", fig.data[0].hovertemplate)
+        if set(col_names) != set(cols):
             raise ValueError(
-                "marker_col is misspecified because the dataframe grouping names don't match the names in the plotly figure."
+                "marker_col/color_col/facet_col is misspecified because the dataframe grouping names don't match the names in the plotly figure.",
             )
 
-    elif len(cols) == 2:  # color_col and marker_col
+        df_grouped = df_data.groupby(col_names)
 
-        df_grouped_x = df_data.groupby(cols)
-        df_grouped_y = df_data.groupby([cols[1], cols[0]])
+        str_groups = {}
+        for name, group in df_grouped:
+            if isinstance(name, tuple):
+                str_groups[", ".join(str(x) for x in name)] = group
+            else:
+                str_groups[name] = group
 
-        if test_groups(fig, df_grouped_x):
-            df_grouped = df_grouped_x
+        curve_dict = {}
+        for index, data in enumerate(fig.data):
+            curve_name = re.findall(r".*?=(?!%)(.*?)<.*?>", data.hovertemplate)
+            curve_name = ", ".join(str(x) for x in curve_name)
+            curve_dict[index] = str_groups[curve_name]
 
-        elif test_groups(fig, df_grouped_y):
-            df_grouped = df_grouped_y
-        else:
-            raise ValueError(
-                "color_col and marker_col are misspecified because their dataframe grouping names don't match the names in the plotly figure."
-            )
+        return df_grouped, curve_dict
+
     else:
-        raise ValueError("Too many columns specified for grouping.")
+        grouping_found = False
+        for combo in itertools.permutations(cols):
+            df_grouped_tmp = df_data.groupby(list(combo))
+            if test_groups(fig, df_grouped_tmp):
+                df_grouped = df_grouped_tmp
+                str_groups = {}
+                for name, group in df_grouped:
+                    if isinstance(name, tuple):
+                        str_groups[", ".join(str(x) for x in name)] = group
+                    else:
+                        str_groups[name] = group
+                curve_dict = {
+                    index: str_groups[x["name"]] for index, x in enumerate(fig.data)
+                }
+                grouping_found = True
 
-    str_groups = {}
-    for name, group in df_grouped:
-        if isinstance(name, tuple):
-            str_groups[", ".join(str(x) for x in name)] = group
-        else:
-            str_groups[name] = group
+                return df_grouped, curve_dict
 
-    curve_dict = {index: str_groups[x["name"]] for index, x in enumerate(fig.data)}
-    return df_grouped, curve_dict
+            else:
+                continue
+
+        if not grouping_found:
+            raise ValueError(
+                "marker_col/color_col/facet_cik is misspecified because the dataframe grouping names don't match the names in the plotly figure."
+            )
 
 
 def add_molecules(
@@ -99,6 +120,7 @@ def add_molecules(
     caption_transform: dict[str, Callable] = {},
     color_col: str = None,
     marker_col: str = None,
+    facet_col: str = None,
     wrap: bool = True,
     wraplen: int = 20,
     width: int = 150,
@@ -145,6 +167,8 @@ def add_molecules(
         name of the column in df that is used to color the datapoints in df - necessary when there is discrete conditional coloring (default None).
     marker_col : str, optional
         name of the column in df that is used to determine the marker shape of the datapoints in df (default None).
+    facet_col : str, optional
+        name of the column in df that is used to facet the data to multiple plots (default None).
     wrap : bool, optional
         whether or not to wrap the title text to multiple lines if the length of the text is too long (default True).
     wraplen : int, optional
@@ -156,25 +180,26 @@ def add_molecules(
     fontsize : int, optional
         the font size used in the hover box - the font of the title line is fontsize+2 (default 12).
     """
-    fig.update_traces(hoverinfo="none", hovertemplate=None)
     df_data = df.copy()
     if color_col is not None:
         df_data[color_col] = df_data[color_col].astype(str)
     if marker_col is not None:
         df_data[marker_col] = df_data[marker_col].astype(str)
+    if facet_col is not None:
+        df_data[facet_col] = df_data[facet_col].astype(str)
 
     if len(fig.data) != 1:
         colors = {index: x.marker["color"] for index, x in enumerate(fig.data)}
-        if color_col is None and marker_col is None:
-            raise ValueError(
-                "More than one plotly curve in figure - color_col and/or marker_col needs to be specified."
-            )
-        if color_col is None:
-            _, curve_dict = find_grouping(fig, df_data, [marker_col])
-        elif marker_col is None:
-            _, curve_dict = find_grouping(fig, df_data, [color_col])
-        else:
-            _, curve_dict = find_grouping(fig, df_data, [color_col, marker_col])
+
+        cols = []
+
+        if color_col is not None:
+            cols.append(color_col)
+        if marker_col is not None:
+            cols.append(marker_col)
+        if facet_col is not None:
+            cols.append(facet_col)
+        _, curve_dict = find_grouping(fig, df_data, cols)
     else:
         colors = {0: "black"}
 
@@ -205,10 +230,14 @@ def add_molecules(
         )
     else:
         menu = dcc.Store(id="smiles-menu", data=0)
+
+    fig_copy = go.Figure(fig)
+    fig_copy.update_traces(hoverinfo="none", hovertemplate=None)
+
     app.layout = html.Div(
         [
             menu,
-            dcc.Graph(id="graph-basic-2", figure=fig, clear_on_unhover=True),
+            dcc.Graph(id="graph-basic-2", figure=fig_copy, clear_on_unhover=True),
             dcc.Tooltip(
                 id="graph-tooltip", background_color=f"rgba(255,255,255,{alpha})"
             ),
