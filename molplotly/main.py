@@ -330,7 +330,7 @@ def add_molecules(
                 )
 
         if title_col is not None:
-            title = df_row[title_col].astype(str)
+            title = str(df_row[title_col])
             if title_col in caption_transform:
                 title = caption_transform[title_col](title)
 
