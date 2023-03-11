@@ -8,6 +8,7 @@ import itertools
 import re
 
 import pandas as pd
+import numpy as np
 from dash import Input, Output, dcc, html, no_update
 from jupyter_dash import JupyterDash
 from pandas.core.groupby import DataFrameGroupBy
@@ -54,14 +55,14 @@ def find_grouping(
 ) -> tuple[DataFrameGroupBy, dict]:
 
     if fig.data[0].hovertemplate is not None:
-        col_names = re.findall(r"(.*?)=(?!%).*?<.*?>", fig.data[0].hovertemplate)
+        col_names = re.findall(r"(.*?)=.*?<.*?>", fig.data[0].hovertemplate)
         col_names = [re.sub(r"(.*)>", "", col_name) for col_name in col_names]
-        if set(col_names) != set(cols):
+        if set(cols).issubset(set(col_names)) is False:
             raise ValueError(
                 f"marker_col/color_col/facet_col is misspecified because the specified dataframe grouping names {cols} don't match the names in the plotly figure {col_names}.",
             )
 
-        df_grouped = df_data.groupby(col_names)
+        df_grouped = df_data.groupby(cols)
 
         str_groups = {}
         for name, group in df_grouped:
@@ -72,8 +73,20 @@ def find_grouping(
 
         curve_dict = {}
         for index, data in enumerate(fig.data):
-            curve_name = re.findall(r".*?=(?!%)(.*?)<.*?>", data.hovertemplate)
+            curve_name = re.findall(r".*?=(.*?)<.*?>", data.hovertemplate)
             curve_name = ", ".join(str(x) for x in curve_name)
+            if "%{x}" in curve_name:
+                unique_x_values = np.unique(data.x)
+                if len(unique_x_values) == 1:
+                    curve_name = curve_name.replace("%{x}", str(unique_x_values[0]))
+                else:
+                    curve_name = curve_name.replace(", %{x}", "")
+            if "%{y}" in curve_name:
+                unique_y_values = np.unique(data.y)
+                if len(unique_y_values) == 1:
+                    curve_name = curve_name.replace("%{y}", str(unique_y_values[0]))
+                else:
+                    curve_name = curve_name.replace(", %{y}", "")
             curve_dict[index] = str_groups[curve_name]
 
         return df_grouped, curve_dict
