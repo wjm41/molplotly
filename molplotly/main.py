@@ -215,7 +215,7 @@ def add_molecules(
 
     if mol_col is not None and len(mol_col) > 1:
         menu = dcc.Dropdown(
-            options=[{"label": x, "value": x} for x in mol_col],
+            options=[{"label": x, "smiles_value": x} for x in mol_col],
             value=mol_col[0],
             multi=True,
             id="smiles-menu",
@@ -223,7 +223,7 @@ def add_molecules(
         )
     elif smiles_col is not None and len(smiles_col) > 1:
         menu = dcc.Dropdown(
-            options=[{"label": x, "value": x} for x in smiles_col],
+            options=[{"label": x, "smiles_value": x} for x in smiles_col],
             value=smiles_col[0],
             multi=True,
             id="smiles-menu",
@@ -251,21 +251,24 @@ def add_molecules(
             Output("graph-tooltip", "bbox"),
             Output("graph-tooltip", "children"),
         ],
-        inputs=[Input("graph-basic-2", "hoverData"), Input("smiles-menu", "value")],
+        inputs=[
+            Input("graph-basic-2", "hoverData"),
+            Input("smiles-menu", "smiles_value"),
+        ],
     )
-    def display_hover(hoverData, value):
+    def display_hover(hoverData, smiles_value):
         if hoverData is None:
             return False, no_update, no_update
 
-        if value is None:
+        if smiles_value is None:
             if mol_col is not None:
-                value = mol_col
+                smiles_value = mol_col
             elif smiles_col is not None:
-                value = smiles_col
-        if isinstance(value, str):
-            chosen_smiles = [value]
+                smiles_value = smiles_col
+        if isinstance(smiles_value, str):
+            chosen_smiles = [smiles_value]
         else:
-            chosen_smiles = value
+            chosen_smiles = smiles_value
 
         pt = hoverData["points"][0]
         bbox = pt["bbox"]
