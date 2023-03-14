@@ -17,7 +17,6 @@ A readable walkthrough of how to use the package together with some useful examp
 
 ```sh
 pip install molplotly
-conda install rdkit
 ```
 
 ## Usage

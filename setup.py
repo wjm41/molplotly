@@ -15,6 +15,7 @@ setup(
         "werkzeug>=2.0.0",
         "jupyter-dash>=0.4.2",
         "plotly>=5.0.0",
+        "rdkit-pypi>=2021.9.4",
         "pandas",
         "ipykernel",
         "nbformat",
@@ -29,3 +30,5 @@ setup(
         "Programming Language :: Python :: 3",
     ],
 )
+
+# TODO - change link in blog
