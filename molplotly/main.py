@@ -8,6 +8,7 @@ import itertools
 import re
 
 import pandas as pd
+import numpy as np
 from dash import Input, Output, dcc, html, no_update
 from jupyter_dash import JupyterDash
 from pandas.core.groupby import DataFrameGroupBy
@@ -54,14 +55,14 @@ def find_grouping(
 ) -> tuple[DataFrameGroupBy, dict]:
 
     if fig.data[0].hovertemplate is not None:
-        col_names = re.findall(r"(.*?)=(?!%).*?<.*?>", fig.data[0].hovertemplate)
+        col_names = re.findall(r"(.*?)=.*?<.*?>", fig.data[0].hovertemplate)
         col_names = [re.sub(r"(.*)>", "", col_name) for col_name in col_names]
-        if set(col_names) != set(cols):
+        if set(cols).issubset(set(col_names)) is False:
             raise ValueError(
                 f"marker_col/color_col/facet_col is misspecified because the specified dataframe grouping names {cols} don't match the names in the plotly figure {col_names}.",
             )
 
-        df_grouped = df_data.groupby(col_names)
+        df_grouped = df_data.groupby(cols)
 
         str_groups = {}
         for name, group in df_grouped:
@@ -72,8 +73,20 @@ def find_grouping(
 
         curve_dict = {}
         for index, data in enumerate(fig.data):
-            curve_name = re.findall(r".*?=(?!%)(.*?)<.*?>", data.hovertemplate)
+            curve_name = re.findall(r".*?=(.*?)<.*?>", data.hovertemplate)
             curve_name = ", ".join(str(x) for x in curve_name)
+            if "%{x}" in curve_name:
+                unique_x_values = np.unique(data.x)
+                if len(unique_x_values) == 1:
+                    curve_name = curve_name.replace("%{x}", str(unique_x_values[0]))
+                else:
+                    curve_name = curve_name.replace(", %{x}", "")
+            if "%{y}" in curve_name:
+                unique_y_values = np.unique(data.y)
+                if len(unique_y_values) == 1:
+                    curve_name = curve_name.replace("%{y}", str(unique_y_values[0]))
+                else:
+                    curve_name = curve_name.replace(", %{y}", "")
             curve_dict[index] = str_groups[curve_name]
 
         return df_grouped, curve_dict
@@ -215,7 +228,7 @@ def add_molecules(
 
     if mol_col is not None and len(mol_col) > 1:
         menu = dcc.Dropdown(
-            options=[{"label": x, "value": x} for x in mol_col],
+            options=[{"label": x, "smiles_value": x} for x in mol_col],
             value=mol_col[0],
             multi=True,
             id="smiles-menu",
@@ -223,7 +236,7 @@ def add_molecules(
         )
     elif smiles_col is not None and len(smiles_col) > 1:
         menu = dcc.Dropdown(
-            options=[{"label": x, "value": x} for x in smiles_col],
+            options=[{"label": x, "smiles_value": x} for x in smiles_col],
             value=smiles_col[0],
             multi=True,
             id="smiles-menu",
@@ -251,21 +264,24 @@ def add_molecules(
             Output("graph-tooltip", "bbox"),
             Output("graph-tooltip", "children"),
         ],
-        inputs=[Input("graph-basic-2", "hoverData"), Input("smiles-menu", "value")],
+        inputs=[
+            Input("graph-basic-2", "hoverData"),
+            Input("smiles-menu", "smiles_value"),
+        ],
     )
-    def display_hover(hoverData, value):
+    def display_hover(hoverData, smiles_value):
         if hoverData is None:
             return False, no_update, no_update
 
-        if value is None:
+        if smiles_value is None:
             if mol_col is not None:
-                value = mol_col
+                smiles_value = mol_col
             elif smiles_col is not None:
-                value = smiles_col
-        if isinstance(value, str):
-            chosen_smiles = [value]
+                smiles_value = smiles_col
+        if isinstance(smiles_value, str):
+            chosen_smiles = [smiles_value]
         else:
-            chosen_smiles = value
+            chosen_smiles = smiles_value
 
         pt = hoverData["points"][0]
         bbox = pt["bbox"]
@@ -330,7 +346,7 @@ def add_molecules(
                 )
 
         if title_col is not None:
-            title = df_row[title_col].astype(str)
+            title = str(df_row[title_col])
             if title_col in caption_transform:
                 title = caption_transform[title_col](title)
 
