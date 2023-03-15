@@ -246,24 +246,49 @@ def add_molecules(
     if isinstance(mol_col, str):
         mol_col = [mol_col]
 
-    if mol_col is not None and len(mol_col) > 1:
+    if mol_col is not None:
+        if len(mol_col) > 1:
+            menu = dcc.Dropdown(
+                options=[{"label": x, "value": x} for x in mol_col],
+                value=mol_col[0],
+                multi=True,
+                id="smiles-menu",
+                placeholder="Select a mol column to display",
+            )
+        else:
+            menu = dcc.Dropdown(
+                options=[{"label": mol_col, "value": mol_col}],
+                value=mol_col,
+                multi=False,
+                id="smiles-menu",
+                disabled=True,
+            )
+    elif smiles_col is not None:
+        if len(smiles_col) > 1:
+            menu = dcc.Dropdown(
+                options=[{"label": x, "value": x} for x in smiles_col],
+                value=smiles_col[0],
+                multi=True,
+                id="smiles-menu",
+                placeholder="Select a SMILES column to display",
+                searchable=True,
+            )
+        else:
+            menu = dcc.Dropdown(
+                options=[{"label": smiles_col, "value": smiles_col}],
+                value=smiles_col,
+                multi=False,
+                id="smiles-menu",
+                disabled=True,
+            )
+    else:
         menu = dcc.Dropdown(
-            options=[{"label": x, "smiles_value": x} for x in mol_col],
-            value=mol_col[0],
-            multi=True,
+            options=None,
+            value=None,
             id="smiles-menu",
             placeholder="Select a mol column to display",
+            disabled=True,
         )
-    elif smiles_col is not None and len(smiles_col) > 1:
-        menu = dcc.Dropdown(
-            options=[{"label": x, "smiles_value": x} for x in smiles_col],
-            value=smiles_col[0],
-            multi=True,
-            id="smiles-menu",
-            placeholder="Select a SMILES column to display",
-        )
-    else:
-        menu = dcc.Store(id="smiles-menu", data=0)
 
     fig_copy = go.Figure(fig)
     fig_copy.update_traces(hoverinfo="none", hovertemplate=None)
@@ -286,22 +311,22 @@ def add_molecules(
         ],
         inputs=[
             Input("graph-basic-2", "hoverData"),
-            Input("smiles-menu", "smiles_value"),
+            Input("smiles-menu", "value"),
         ],
     )
-    def display_hover(hoverData, smiles_value):
+    def display_hover(hoverData, value):
         if hoverData is None:
             return False, no_update, no_update
 
-        if smiles_value is None:
+        if value is None:
             if mol_col is not None:
-                smiles_value = mol_col
+                value = mol_col
             elif smiles_col is not None:
-                smiles_value = smiles_col
-        if isinstance(smiles_value, str):
-            chosen_smiles = [smiles_value]
+                value = smiles_col
+        if isinstance(value, str):
+            chosen_smiles = [value]
         else:
-            chosen_smiles = smiles_value
+            chosen_smiles = value
 
         pt = hoverData["points"][0]
         bbox = pt["bbox"]
