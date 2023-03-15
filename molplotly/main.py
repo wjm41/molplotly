@@ -133,6 +133,7 @@ def add_molecules(
     caption_cols: list[str] = None,
     caption_transform: dict[str, Callable] = {},
     color_col: str = None,
+    symbol_col: str = None,
     marker_col: str = None,
     facet_col: str = None,
     wrap: bool = True,
@@ -179,6 +180,8 @@ def add_molecules(
         the key must correspond to one of the columns in subset or tooltip (default {}).
     color_col : str, optional
         name of the column in df that is used to color the datapoints in df - necessary when there is discrete conditional coloring (default None).
+    symbol_col : str, optional
+        name of the column in df that is used to determine the symbols of the datapoints in df (default None).
     marker_col : str, optional
         name of the column in df that is used to determine the marker shape of the datapoints in df (default None).
     facet_col : str, optional
@@ -197,6 +200,8 @@ def add_molecules(
     df_data = df.copy()
     if color_col is not None:
         df_data[color_col] = df_data[color_col].astype(str)
+    if symbol_col is not None:
+        df_data[symbol_col] = df_data[symbol_col].astype(str)
     if marker_col is not None:
         df_data[marker_col] = df_data[marker_col].astype(str)
     if facet_col is not None:
@@ -211,8 +216,11 @@ def add_molecules(
             cols.append(color_col)
         if marker_col is not None:
             cols.append(marker_col)
+        if symbol_col is not None:
+            cols.append(symbol_col)
         if facet_col is not None:
             cols.append(facet_col)
+        cols = list(set(cols))
         _, curve_dict = find_grouping(fig, df_data, cols)
     else:
         colors = {0: "black"}
