@@ -50,6 +50,15 @@ def test_groups(fig: Figure, df_grouped: DataFrameGroupBy):
     return True
 
 
+def find_correct_column_order(cols, col_names):
+
+    correctly_ordered_cols = []
+    for col in col_names:
+        if col in cols:
+            correctly_ordered_cols.append(col)
+    return correctly_ordered_cols
+
+
 def find_grouping(
     fig: Figure, df_data: pd.DataFrame, cols: list[str]
 ) -> tuple[DataFrameGroupBy, dict]:
@@ -62,6 +71,7 @@ def find_grouping(
                 f"marker_col/color_col/facet_col is misspecified because the specified dataframe grouping names {cols} don't match the names in the plotly figure {col_names}.",
             )
 
+        cols = find_correct_column_order(cols, col_names)
         df_grouped = df_data.groupby(cols)
 
         str_groups = {}
@@ -77,16 +87,24 @@ def find_grouping(
             curve_name = ", ".join(str(x) for x in curve_name)
             if "%{x}" in curve_name:
                 unique_x_values = np.unique(data.x)
-                if len(unique_x_values) == 1:
+                if len(unique_x_values) == 1 and len(data.x) != 1:
                     curve_name = curve_name.replace("%{x}", str(unique_x_values[0]))
                 else:
                     curve_name = curve_name.replace(", %{x}", "")
             if "%{y}" in curve_name:
                 unique_y_values = np.unique(data.y)
-                if len(unique_y_values) == 1:
+                if len(unique_y_values) == 1 and len(data.y) != 1:
                     curve_name = curve_name.replace("%{y}", str(unique_y_values[0]))
                 else:
                     curve_name = curve_name.replace(", %{y}", "")
+            if "%{marker.size}" in curve_name:
+                unique_size_values = np.unique(data.marker.size)
+                if len(unique_size_values) == 1 and len(data.marker.size) != 1:
+                    curve_name = curve_name.replace(
+                        "%{marker.size}", str(unique_size_values[0])
+                    )
+                else:
+                    curve_name = curve_name.replace(", %{marker.size}", "")
             curve_dict[index] = str_groups[curve_name]
 
         return df_grouped, curve_dict
@@ -133,6 +151,7 @@ def add_molecules(
     caption_cols: list[str] = None,
     caption_transform: dict[str, Callable] = {},
     color_col: str = None,
+    symbol_col: str = None,
     marker_col: str = None,
     facet_col: str = None,
     wrap: bool = True,
@@ -179,8 +198,8 @@ def add_molecules(
         the key must correspond to one of the columns in subset or tooltip (default {}).
     color_col : str, optional
         name of the column in df that is used to color the datapoints in df - necessary when there is discrete conditional coloring (default None).
-    marker_col : str, optional
-        name of the column in df that is used to determine the marker shape of the datapoints in df (default None).
+    symbol_col : str, optional
+        name of the column in df that is used to determine the symbols of the datapoints in df (default None).
     facet_col : str, optional
         name of the column in df that is used to facet the data to multiple plots (default None).
     wrap : bool, optional
@@ -197,8 +216,8 @@ def add_molecules(
     df_data = df.copy()
     if color_col is not None:
         df_data[color_col] = df_data[color_col].astype(str)
-    if marker_col is not None:
-        df_data[marker_col] = df_data[marker_col].astype(str)
+    if symbol_col is not None:
+        df_data[symbol_col] = df_data[symbol_col].astype(str)
     if facet_col is not None:
         df_data[facet_col] = df_data[facet_col].astype(str)
 
@@ -209,10 +228,11 @@ def add_molecules(
 
         if color_col is not None:
             cols.append(color_col)
-        if marker_col is not None:
-            cols.append(marker_col)
+        if symbol_col is not None:
+            cols.append(symbol_col)
         if facet_col is not None:
             cols.append(facet_col)
+        cols = list(set(cols))
         _, curve_dict = find_grouping(fig, df_data, cols)
     else:
         colors = {0: "black"}
@@ -226,24 +246,49 @@ def add_molecules(
     if isinstance(mol_col, str):
         mol_col = [mol_col]
 
-    if mol_col is not None and len(mol_col) > 1:
+    if mol_col is not None:
+        if len(mol_col) > 1:
+            menu = dcc.Dropdown(
+                options=[{"label": x, "value": x} for x in mol_col],
+                value=mol_col[0],
+                multi=True,
+                id="smiles-menu",
+                placeholder="Select a mol column to display",
+            )
+        else:
+            menu = dcc.Dropdown(
+                options=[{"label": mol_col, "value": mol_col}],
+                value=mol_col,
+                multi=False,
+                id="smiles-menu",
+                disabled=True,
+            )
+    elif smiles_col is not None:
+        if len(smiles_col) > 1:
+            menu = dcc.Dropdown(
+                options=[{"label": x, "value": x} for x in smiles_col],
+                value=smiles_col[0],
+                multi=True,
+                id="smiles-menu",
+                placeholder="Select a SMILES column to display",
+                searchable=True,
+            )
+        else:
+            menu = dcc.Dropdown(
+                options=[{"label": smiles_col, "value": smiles_col}],
+                value=smiles_col,
+                multi=False,
+                id="smiles-menu",
+                disabled=True,
+            )
+    else:
         menu = dcc.Dropdown(
-            options=[{"label": x, "smiles_value": x} for x in mol_col],
-            value=mol_col[0],
-            multi=True,
+            options=None,
+            value=None,
             id="smiles-menu",
             placeholder="Select a mol column to display",
+            disabled=True,
         )
-    elif smiles_col is not None and len(smiles_col) > 1:
-        menu = dcc.Dropdown(
-            options=[{"label": x, "smiles_value": x} for x in smiles_col],
-            value=smiles_col[0],
-            multi=True,
-            id="smiles-menu",
-            placeholder="Select a SMILES column to display",
-        )
-    else:
-        menu = dcc.Store(id="smiles-menu", data=0)
 
     fig_copy = go.Figure(fig)
     fig_copy.update_traces(hoverinfo="none", hovertemplate=None)
@@ -266,22 +311,22 @@ def add_molecules(
         ],
         inputs=[
             Input("graph-basic-2", "hoverData"),
-            Input("smiles-menu", "smiles_value"),
+            Input("smiles-menu", "value"),
         ],
     )
-    def display_hover(hoverData, smiles_value):
+    def display_hover(hoverData, value):
         if hoverData is None:
             return False, no_update, no_update
 
-        if smiles_value is None:
+        if value is None:
             if mol_col is not None:
-                smiles_value = mol_col
+                value = mol_col
             elif smiles_col is not None:
-                smiles_value = smiles_col
-        if isinstance(smiles_value, str):
-            chosen_smiles = [smiles_value]
+                value = smiles_col
+        if isinstance(value, str):
+            chosen_smiles = [value]
         else:
-            chosen_smiles = smiles_value
+            chosen_smiles = value
 
         pt = hoverData["points"][0]
         bbox = pt["bbox"]
