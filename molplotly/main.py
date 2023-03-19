@@ -68,7 +68,7 @@ def find_grouping(
         col_names = [re.sub(r"(.*)>", "", col_name) for col_name in col_names]
         if set(cols).issubset(set(col_names)) is False:
             raise ValueError(
-                f"marker_col/color_col/facet_col is misspecified because the specified dataframe grouping names {cols} don't match the names in the plotly figure {col_names}.",
+                f"symbol_col/color_col/facet_col is misspecified because the specified dataframe grouping names {cols} don't match the names in the plotly figure {col_names}.",
             )
 
         cols = find_correct_column_order(cols, col_names)
@@ -133,7 +133,7 @@ def find_grouping(
 
         if not grouping_found:
             raise ValueError(
-                "marker_col/color_col/facet_cik is misspecified because the dataframe grouping names don't match the names in the plotly figure."
+                "symbol_col/color_col/facet_col is misspecified because the dataframe grouping names don't match the names in the plotly figure."
             )
 
 
@@ -152,7 +152,6 @@ def add_molecules(
     caption_transform: dict[str, Callable] = {},
     color_col: str = None,
     symbol_col: str = None,
-    marker_col: str = None,
     facet_col: str = None,
     wrap: bool = True,
     wraplen: int = 20,
