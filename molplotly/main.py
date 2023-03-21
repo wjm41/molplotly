@@ -16,6 +16,7 @@ from plotly.graph_objects import Figure
 import plotly.graph_objects as go
 
 from rdkit import Chem
+from rdkit.Chem.rdChemReactions import ReactionFromSmarts
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.Draw import rdMolDraw2D
 
@@ -143,7 +144,8 @@ def add_molecules(
     smiles_col: str | list[str] = "SMILES",
     mol_col: Mol | list[Mol] = None,
     show_img: bool = True,
-    svg_size: int = 200,
+    svg_height: int = 200,
+    svg_width: int = 200,
     alpha: float = 0.75,
     mol_alpha: float = 0.7,
     title_col: str = None,
@@ -158,6 +160,7 @@ def add_molecules(
     width: int = 150,
     fontfamily: str = "Arial",
     fontsize: int = 12,
+    reaction: bool = False,
 ) -> JupyterDash:
     """
     A function that takes a plotly figure and a dataframe with molecular SMILES
@@ -180,8 +183,10 @@ def add_molecules(
         If provided as a list, will add a slider to choose which column is used for rendering the structures.
     show_img : bool, optional
         whether or not to generate the molecule image in the dash app (default True).
-    svg_size : float, optional
-        the size in pixels of the molecule drawing (default 200).
+    svg_height : float, optional
+        the svg_height in pixels of the molecule drawing (default 200).
+    svg_width : float, optional
+        the svg_width in pixels of the molecule drawing (default 200).
     alpha : float, optional
         the transparency of the hoverbox, 0 for full transparency 1 for full opaqueness (default 0.7).
     mol_alpha : float, optional
@@ -211,6 +216,8 @@ def add_molecules(
         the font family used in the hover box (default 'Arial').
     fontsize : int, optional
         the font size used in the hover box - the font of the title line is fontsize+2 (default 12).
+    reaction: bool, optional
+        toggles rdkit to process the image like a reaction
     """
     df_data = df.copy()
     if color_col is not None:
@@ -347,10 +354,16 @@ def add_molecules(
                 if isinstance(smiles, str):
                     # Generate 2D SVG if smiles column is a string
 
-                    d2d = rdMolDraw2D.MolDraw2DSVG(svg_size, svg_size)
+                    d2d = rdMolDraw2D.MolDraw2DSVG(svg_width, svg_height)
                     opts = d2d.drawOptions()
                     opts.clearBackground = False
-                    d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
+                    if reaction:
+                        try:
+                            d2d.DrawReaction(ReactionFromSmarts(smiles, useSmiles=True))
+                        except:
+                            d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
+                    else:
+                        d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
                     d2d.FinishDrawing()
                     img_str = d2d.GetDrawingText()
                     buffered.write(str.encode(img_str))
