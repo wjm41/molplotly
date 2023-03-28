@@ -144,8 +144,9 @@ def add_molecules(
     smiles_col: str | list[str] = "SMILES",
     mol_col: Mol | list[Mol] = None,
     show_img: bool = True,
-    svg_height: int = 200,
-    svg_width: int = 200,
+    svg_size: int = 200,
+    svg_height: int | None = None,
+    svg_width: int | None = None,
     alpha: float = 0.75,
     mol_alpha: float = 0.7,
     title_col: str = None,
@@ -183,10 +184,12 @@ def add_molecules(
         If provided as a list, will add a slider to choose which column is used for rendering the structures.
     show_img : bool, optional
         whether or not to generate the molecule image in the dash app (default True).
-    svg_height : float, optional
-        the svg_height in pixels of the molecule drawing (default 200).
-    svg_width : float, optional
-        the svg_width in pixels of the molecule drawing (default 200).
+    svg_size: int, optional
+        the size in pixels of the height and width of the drawing. Is overridden by svg_height or svg_width (default 200)
+    svg_height : int, optional
+        the svg_height in pixels of the molecule drawing (default None).
+    svg_width : int, optional
+        the svg_width in pixels of the molecule drawing (default None).
     alpha : float, optional
         the transparency of the hoverbox, 0 for full transparency 1 for full opaqueness (default 0.7).
     mol_alpha : float, optional
@@ -346,6 +349,10 @@ def add_molecules(
             df_row = df.iloc[num]
 
         hoverbox_elements = []
+        if not svg_height:
+            svg_height = svg_size
+        if not svg_width:
+            svg_width = svg_size
 
         if show_img:
             for col in chosen_smiles:
