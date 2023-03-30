@@ -246,6 +246,11 @@ def add_molecules(
     else:
         colors = {0: "black"}
 
+    if not svg_height:
+        svg_height = svg_size
+    if not svg_width:
+        svg_width = svg_size
+
     app = JupyterDash(__name__)
     if smiles_col is None and mol_col is None:
         raise ValueError("Either smiles_col or mol_col has to be specified!")
@@ -349,10 +354,6 @@ def add_molecules(
             df_row = df.iloc[num]
 
         hoverbox_elements = []
-        if not svg_height:
-            svg_height = svg_size
-        if not svg_width:
-            svg_width = svg_size
 
         if show_img:
             for col in chosen_smiles:
