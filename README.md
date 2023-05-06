@@ -98,3 +98,4 @@ Just adding a warning here that memory usage in a notebook can increase signific
 
 - [@wjm41](https://github.com/wjm41) (contributor)
 - [@RokasEl](https://github.com/RokasEl) (contributor)
+- [@ipendlet](https://github.com/ipendlet) (contributor)
