@@ -10,7 +10,12 @@ import re
 import pandas as pd
 import numpy as np
 from dash import Input, Output, dcc, html, no_update
-from jupyter_dash import JupyterDash
+import dash
+from packaging import version
+if version.parse(dash.__version__) >= version.parse("2.11"):
+    from dash import Dash as JupyterDash
+else:
+    from jupyter_dash import JupyterDash
 from pandas.core.groupby import DataFrameGroupBy
 from plotly.graph_objects import Figure
 import plotly.graph_objects as go
