@@ -15,7 +15,7 @@ setup(
         "werkzeug>=2.0.0",
         "jupyter-dash>=0.4.2",
         "plotly>=5.0.0",
-        "rdkit-pypi>=2021.9.4",
+        "rdkit",
         "pandas",
         "ipykernel",
         "nbformat",
