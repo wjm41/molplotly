@@ -1,24 +1,22 @@
 from __future__ import annotations
 
 import base64
+import itertools
+import re
 import textwrap
 from io import BytesIO
 from typing import Callable
-import itertools
-import re
 
-import pandas as pd
 import numpy as np
-from dash import Input, Output, dcc, html, no_update
-from jupyter_dash import JupyterDash
+import pandas as pd
+import plotly.graph_objects as go
+from dash import Dash, Input, Output, dcc, html, no_update
 from pandas.core.groupby import DataFrameGroupBy
 from plotly.graph_objects import Figure
-import plotly.graph_objects as go
-
 from rdkit import Chem
+from rdkit.Chem.Draw import rdMolDraw2D
 from rdkit.Chem.rdChemReactions import ReactionFromSmarts
 from rdkit.Chem.rdchem import Mol
-from rdkit.Chem.Draw import rdMolDraw2D
 
 
 def str2bool(v: str) -> bool:
@@ -162,12 +160,11 @@ def add_molecules(
     fontfamily: str = "Arial",
     fontsize: int = 12,
     reaction: bool = False,
-) -> JupyterDash:
+) -> Dash:
     """
     A function that takes a plotly figure and a dataframe with molecular SMILES
-    and returns a dash app that dynamically generates an image of molecules in the hover box
+    and returns a Dash app that dynamically generates an image of molecules in the hover box
     when hovering the mouse over datapoints.
-    ...
 
     Attributes
     ----------
@@ -251,7 +248,7 @@ def add_molecules(
     if not svg_width:
         svg_width = svg_size
 
-    app = JupyterDash(__name__)
+    app = Dash(__name__)
     if smiles_col is None and mol_col is None:
         raise ValueError("Either smiles_col or mol_col has to be specified!")
 
@@ -368,7 +365,7 @@ def add_molecules(
                     if reaction:
                         try:
                             d2d.DrawReaction(ReactionFromSmarts(smiles, useSmiles=True))
-                        except:
+                        except Exception:
                             d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
                     else:
                         d2d.DrawMolecule(Chem.MolFromSmiles(smiles))
