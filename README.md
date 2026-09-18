@@ -3,7 +3,7 @@
 [![Powered by RDKit](https://img.shields.io/static/v1?label=Powered%20by&message=RDKit&color=3838ff&style=flat&logo=data:image/x-icon;base64,AAABAAEAEBAQAAAAAABoAwAAFgAAACgAAAAQAAAAIAAAAAEAGAAAAAAAAAMAABILAAASCwAAAAAAAAAAAADc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/FBT/FBT/FBT/FBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/PBT/PBT/PBT/PBT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/jIz/jIz/jIz/jIz/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/jIz/jIz/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/tLT/tLT/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/tLT/tLT/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/jIz/jIz/jIz/jIz/jIz/jIz/ZGT/ZGT/PBT/FBTc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/jIz/jIz/jIz/jIz/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/ZGT/ZGT/ZGT/ZGT/ZGT/ZGT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/PBT/PBT/PBT/PBT/PBT/PBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/FBT/FBT/FBT/FBT/FBT/FBTc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nz/////+B////AP///gB///wAP//4AB//+AAf//gAH//4AB//+AAf//gAH//8AD///gB///8A////gf////////)](https://www.rdkit.org/)
 [![PyPI version](https://img.shields.io/pypi/v/molplotly)](https://pypi.python.org/pypi/molplotly)
 [![PyPI Downloads](https://pepy.tech/badge/molplotly)](https://pepy.tech/project/molplotly)
-[![This project supports Python 3.8+](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org/downloads)
+[![This project supports Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org/downloads)
 
 `molplotly` is an add-on to `plotly` built on RDKit which allows 2D images of molecules to be shown in `plotly` figures when hovering over the data points.
 
@@ -44,7 +44,7 @@ app = molplotly.add_molecules(fig=fig,
                             )
 
 # run Dash app inline in notebook (or in an external server)
-app.run_server(mode='inline', port=8700, height=1000)
+app.run(port=8700, height=1000, jupyter_mode='inline')
 ```
 
 ### Input parameters
@@ -72,15 +72,14 @@ app.run_server(mode='inline', port=8700, height=1000)
 
 #### Output parameters
 
-by default a JupyterDash `app` is returned which can be run inline in a jupyter notebook or deployed on a server via `app.run_server()`
+by default a Dash `app` is returned which can be run inline in a jupyter notebook or deployed on a server via `app.run()`
 
 - The recommended `height` of the app is `50+(height of the plotly figure)`.
 - For the `port` of the app, make sure you don't pick the same `port` as another `molplotly` plot otherwise the tooltips will clash with each other. Also, apparently on windows port numbers below `8700` are used by other processes so for safety processes keep to numbers above that.
 
 ## Can I run this in colab?
 
-JupyterDash is supposed to have support for Google Colab but at some point that seems to have broken.. Keep an eye on the raised issue [here](https://github.com/plotly/jupyter-dash/issues/10)!
-Update (1st March 2022): The plots seem to be running again but the hoverboxes are not showing so I don't think it has been fully fixed - I will keep an eye on it in the meantime.
+Modern Dash (>=2.11) has native support for running in Jupyter notebooks and Google Colab without any extra dependencies.
 
 ## Can I save these plots?
 

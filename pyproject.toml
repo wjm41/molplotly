@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "molplotly"
+version = "2.0.0"
+description = "plotly add-on to render molecule images on mouseover"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [
+    { name = "William McCorkindale", email = "wjm41@cam.ac.uk" },
+]
+keywords = ["science", "chemistry", "cheminformatics"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "dash>=2.11.0",
+    "plotly>=5.0.0",
+    "rdkit",
+    "pandas",
+    "numpy",
+]
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-cov"]
+
+[project.urls]
+Homepage = "https://github.com/wjm41/molplotly"
+Repository = "https://github.com/wjm41/molplotly"
+Issues = "https://github.com/wjm41/molplotly/issues"
+
+[tool.setuptools.packages.find]
+include = ["molplotly*"]
